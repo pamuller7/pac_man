@@ -28,7 +28,8 @@ class BlueGhost(Ghost):
         super().__init__(pos_x, pos_y)
 
 #    def find_path(self):
-#       Son ciblage dépend à la fois de la position de Rouge et de Pac-Man,
+#       Son ciblage dépend à la fois de la position de Rouge et de Pac-Man, (on va dire qu'il cible devant pac man si
+#       rouge derrier, derrier pac man sinon)
 
 class OrangeGhost(Ghost):
     def __init__(self, pos_x, pos_y):
