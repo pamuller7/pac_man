@@ -8,6 +8,7 @@ class Ghost(Entity):
                          speed=1, player=False, size=8)
 
     def run_away(self):
+        # baisse la vitesse de ghost, et essaie de s'eloigner de pac man
         pass
     
     def find_tile(self):
