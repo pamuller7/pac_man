@@ -1,6 +1,7 @@
 from pos import Pos
 from typing import List, Tuple
 from collections import deque
+import math
 
 
 
@@ -11,17 +12,15 @@ class Entity:
                  targetable: bool, speed: int = 1,
                  player: bool = False, size: int = 8):
         self.pos = Pos(pos_x, pos_y)
+        self.init_pos = (pos_x, pos_y)
         self.hp = hp
         self.targetable = targetable
         self.speed = speed
         self.player = player
         self.size = size
         self.alive = True
-        self._shortest_path = False
+        self.shortest_path = False
         Entity.entities.append(self)
-    
-    def get_pos(self):
-        return (self.pos.x, self.pos.y)
 
     def moove_up(self):
         self.pos.up(self.speed)
@@ -70,7 +69,7 @@ class Entity:
                     prev[(nx, ny)] = ((x, y), letter)
                     queue.append((nx, ny))
         if goal not in prev:
-            self._shortest_path = False
+            self.shortest_path = False
             print("Error: no shortest path found.")
             return
         letters = []
@@ -79,5 +78,10 @@ class Entity:
             parent, letter = prev[cur]
             letters.append(letter)
             cur = parent
-        self._shortest_path = ''.join(reversed(letters))
+        self.shortest_path = ''.join(reversed(letters))
         return
+
+    def get_dist(origin, target):
+        x_o, y_o = origin
+        x_t, y_t = target
+        return (math.sqrt((x_o - x_t)**2 + (y_o - y_t)**2))
