@@ -107,4 +107,4 @@ class Entity:
         """Returns the euclidean distance between two points."""
         x_o, y_o = origin
         x_t, y_t = target
-        return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)  
+        return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)   
