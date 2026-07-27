@@ -1,5 +1,3 @@
-# from .entities import *
-from .renderer import display_maze
+from .engine import Engine
 
-
-__all__ = ["entities", "display_maze"]
+__all__ = ["entities", "renderer", "engine", "Engine"]

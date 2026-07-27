@@ -1,4 +1,4 @@
-from src.renderer import display_maze
+from src.engine import Engine
 from mazegenerator import MazeGenerator
 
 mg = MazeGenerator(size=(20, 20), seed=42)
@@ -8,4 +8,4 @@ for row in mg.maze:
         print(cell, end=" ")
     print()
 
-display_maze(mg.maze)
+Engine(mg.maze).run()

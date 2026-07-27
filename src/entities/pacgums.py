@@ -1,4 +1,4 @@
-from pos import Pos
+from .pos import Pos
 from typing import List
 
 

@@ -1,4 +1,3 @@
-from .display import display_maze
+from .display import draw_maze, draw_cell, TAILLE_CASE
 
-
-__all__ = ["display_maze"]
+__all__ = ["draw_maze", "draw_cell", "TAILLE_CASE"]

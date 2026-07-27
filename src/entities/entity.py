@@ -1,8 +1,12 @@
-from pos import Pos
+from .pos import Pos
+from ..error import DirectionError
 from typing import List, Tuple
 from collections import deque
 import math
 
+
+CODE_DIR = {"N": 1, "E": 2, "S": 4, "W": 8}
+DELTA_DIR = {"N": (0, -1), "E": (1, 0), "S": (0, 1), "W": (-1, 0)}
 
 class Entity:
     """Base class for any movable game entity (Pac-Man, ghosts)."""
@@ -43,6 +47,37 @@ class Entity:
     def moove_right(self) -> None:
         """Moves the entity right by its speed."""
         self.pos.right(self.speed)
+    
+    
+    def can_move(self, maze: List[List[int]], direction: str) -> bool:
+        """Checks if moving in `direction` is possible (no wall, in bounds).
+
+        Raises:
+            DirectionError: if `direction` is not one of 'N', 'E', 'S', 'W'.
+        """
+        if direction not in DELTA_DIR:
+            raise DirectionError(direction)
+        x, y = self.get_pos()
+        dx, dy = DELTA_DIR[direction]
+        nx, ny = x + dx, y + dy
+        if not (0 <= ny < len(maze) and 0 <= nx < len(maze[0])):
+            return False
+        return (maze[y][x] & CODE_DIR[direction]) == 0
+    
+    
+    def try_move(self, maze: List[List[int]], direction: str) -> bool:
+        """Moves the entity in `direction` if there is no wall. Returns True if moved."""
+        if not self.can_move(maze, direction):
+            return False
+        if direction == "N":
+            self.moove_up()
+        elif direction == "S":
+            self.moove_down()
+        elif direction == "E":
+            self.moove_right()
+        elif direction == "W":
+            self.moove_left()
+        return True
 
     def is_eaten(self, hunter: "Entity") -> bool:
         """Checks if this entity is eaten by the hunter entity."""

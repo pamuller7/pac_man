@@ -1,5 +1,5 @@
-from entity import Entity
-from pos import Pos
+from .entity import Entity
+from .pos import Pos
 
 
 class Ghost(Entity):
