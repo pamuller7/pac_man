@@ -21,6 +21,8 @@ GHOST_RED_SPRITE = "assets/ghost_red.png"
 
 MOVE_INTERVAL = 150
 
+
+
 KEY_TO_DIR = {
     pygame.K_UP: "N", pygame.K_w: "N",
     pygame.K_DOWN: "S", pygame.K_s: "S",
@@ -116,12 +118,15 @@ class Engine:
         spawn_col, spawn_row = find_spawn(maze)
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         self.pacman = PacMan(spawn_col, spawn_row, PAC_SPRITE)
-        self.ghosts = [RedGhost(red_pos[0], red_pos[1], GHOST_RED_SPRITE, self.pacman.pos),
-                       BlueGhost(blue_pos[0], blue_pos[1], GHOST_BLUE_SPRITE, self.pacman.pos),
-                       OrangeGhost(orange_pos[0], orange_pos[1], GHOST_ORANGE_SPRITE, self.pacman.pos),
-                       PurpuleGhost(pink_pos[0], pink_pos[1], GHOST_PINK_SPRITE, self.pacman.pos)]
-
-        self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000)
+        self.ghosts = [RedGhost(red_pos[0], red_pos[1],
+                                GHOST_RED_SPRITE, self.pacman.pos),
+                       BlueGhost(blue_pos[0], blue_pos[1],
+                                 GHOST_BLUE_SPRITE, self.pacman.pos),
+                       OrangeGhost(orange_pos[0], orange_pos[1],
+                                   GHOST_ORANGE_SPRITE, self.pacman.pos),
+                       PurpuleGhost(pink_pos[0], pink_pos[1],
+                                    GHOST_PINK_SPRITE, self.pacman.pos)]
+        self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000) - 80
         self.render_x = float(spawn_col * TAILLE_CASE)
         self.render_y = float(spawn_row * TAILLE_CASE)
         self.current_dir: str | None = None
@@ -168,10 +173,9 @@ class Engine:
     def _update(self, dt: float) -> None:
         """Advances Pac-Man: step on the grid, then slide toward the cell."""
         for entity in Entity.entities:
-            print("\n\n", entity.pos.x, entity.pos.y)
+            entity.check_eaten()
             target_x = entity.pos.x * TAILLE_CASE
             target_y = entity.pos.y * TAILLE_CASE
-            print(entity.render_x, entity.render_y, target_x, target_y)
             if entity.render_x == target_x and entity.render_y == target_y:
                 self._step(entity)
                 target_x = entity.pos.x * TAILLE_CASE
@@ -183,9 +187,13 @@ class Engine:
 
     def _step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
-        print(entity.facing)
-        if self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
+        if entity.player and self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
             entity.facing = self.buffered_dir
+        elif not entity.player:
+            entity.find_target_tile()
+            entity.find_short_path(self.maze, entity.target_tile)
+            if entity.shortest_path:
+                entity.facing = entity.shortest_path[0]
         if entity.facing and entity.can_move(self.maze, entity.facing):
             entity.try_move(self.maze, entity.facing)
 
