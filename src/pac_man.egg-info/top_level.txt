@@ -1,5 +1,0 @@
-__init__
-engine
-entities
-error
-renderer
