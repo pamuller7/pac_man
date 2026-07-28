@@ -8,13 +8,14 @@ class Ghost(Entity):
     ghosts = dict()
 
     def __init__(self, pos_x: int, pos_y: int, sprite: str, pac_man_pos: Pos,
-                 hp: int = 1, targetable: bool = False):
+                 hp: int = 1, targetable: bool = False, speed=2.7):
         super().__init__(pos_x, pos_y, hp, targetable, sprite,
-                         speed=1, player=False, size=8)
+                         speed, player=False, size=8)
         self.target_tile = (0, 0)
         self.mooves = [('N', 0, -1), ('W', -1, 0), ('S', 0, 1), ('E', 1, 0)]
         self.pac_man_pos = pac_man_pos
         self.chase = False
+        self.speed = speed
         self.chase_limit = 10
         self.chill = self.chase_limit * 3
         self.chasing_since = time()
@@ -27,7 +28,7 @@ class Ghost(Entity):
             self.run_away()
 
     def run_away(self):
-        """Choisit comme cible le coin le plus éloigné de Pac-Man."""
+        """Choisit comme cible le coin le plus proche de Pac-Man."""
         px, py = self.pac_man_pos.get_pos()
         corners = [
             (0, 0),
@@ -50,6 +51,10 @@ class Ghost(Entity):
         return (self.target_tile)
 
     def going_b4_pac_man(self):
+        dist = self.get_dist(self.pos.get_pos(), self.pac_man_pos.get_pos())
+        if dist > 10:
+            self.tracking()
+            return (self.target_tile)
         x, y = self.pac_man_pos.get_pos()
         for facing, moove_x, moove_y in self.mooves:
             if self.pac_man_pos.get_facing() == facing:
@@ -80,8 +85,8 @@ class Ghost(Entity):
 
 
 class RedGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos)
+    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
+        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
         Ghost.ghosts.update({"red": self})
 
     def find_target_tile(self):
@@ -95,8 +100,8 @@ class RedGhost(Ghost):
 
 
 class BlueGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos)
+    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
+        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
         Ghost.ghosts.update({"blue": self})
 
     def find_target_tile(self):
@@ -112,8 +117,8 @@ class BlueGhost(Ghost):
 
 
 class OrangeGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos)
+    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
+        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
         Ghost.ghosts.update({"orange": self})
 
     def find_target_tile(self):
@@ -128,8 +133,8 @@ class OrangeGhost(Ghost):
 
 
 class PurpuleGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos)
+    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
+        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
         Ghost.ghosts.update({"purpule": self})
 
     def find_target_tile(self):

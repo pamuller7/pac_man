@@ -15,7 +15,7 @@ class Entity:
     entities: List["Entity"] = []
 
     def __init__(self, pos_x: int, pos_y: int, hp: int,
-                 targetable: bool, sprite: str, speed: int = 1,
+                 targetable: bool, sprite: str, speed: int = 2,
                  player: bool = False, size: int = 8, facing="N") -> None:
         """Initializes a new entity and registers it globally."""
         self.pos = Pos(pos_x, pos_y)
@@ -28,6 +28,7 @@ class Entity:
         self.facing = facing
         self.invisibility_time = 20
         self.alive = True
+        self.speed = speed
         self.shortest_path: str | bool = False
         self.sprite = sprite
         self.render_x = float(pos_x * 40)
