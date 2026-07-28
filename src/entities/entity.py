@@ -3,6 +3,7 @@ from ..error import DirectionError
 from typing import List, Tuple
 from collections import deque
 import math
+from time import time
 
 
 CODE_DIR = {"N": 1, "E": 2, "S": 4, "W": 8}
@@ -25,6 +26,7 @@ class Entity:
         self.player = player
         self.size = size
         self.facing = facing
+        self.invisibility_time = 20
         self.alive = True
         self.shortest_path: str | bool = False
         self.sprite = sprite
@@ -69,6 +71,9 @@ class Entity:
 
     def try_move(self, maze: List[List[int]], direction: str) -> bool:
         """Moves the entity in `direction` if there is no wall. Returns True if moved."""
+        if self.player:
+            print(self.pos.get_pos())
+            print(self.hp)
         if not self.can_move(maze, direction):
             return False
         if direction == "N":
@@ -82,10 +87,20 @@ class Entity:
         self.facing = direction
         return True
 
+    @staticmethod
+    def check_eaten():
+        for entity1 in Entity.entities:
+            for entity2 in Entity.entities:
+                if entity1 == entity2:
+                    continue
+                if entity1.pos.get_pos() == entity2.pos.get_pos():
+                    entity1.is_eaten(entity2)
+
     def is_eaten(self, hunter: "Entity") -> bool:
         """Checks if this entity is eaten by the hunter entity."""
         if self.targetable and not hunter.targetable:
             self.hp -= 1
+            self.targetable = False
             if self.hp <= 0:
                 self.alive = False
             return True
