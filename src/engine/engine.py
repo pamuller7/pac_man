@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from ..entities import PacMan
+from ..entities import PacMan, Entity, RedGhost, BlueGhost, OrangeGhost, PurpuleGhost
 from ..error import (
     AssetError,
     AssetNotFoundError,
@@ -14,6 +14,10 @@ from ..error import (
 from ..renderer import TAILLE_CASE, draw_maze
 
 PAC_SPRITE = "assets/pacman.png"
+GHOST_BLUE_SPRITE = "assets/ghost_blue.png"
+GHOST_ORANGE_SPRITE = "assets/ghost_orange.png"
+GHOST_PINK_SPRITE = "assets/ghost_pink.png"
+GHOST_RED_SPRITE = "assets/ghost_red.png"
 
 MOVE_INTERVAL = 150
 
@@ -76,6 +80,11 @@ def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
     return best
 
 
+def find_corner(maze: list[list[int]]):
+    rows, cols = len(maze), len(maze[0])
+    return ([(0, 0), (0, rows - 1), (cols - 1, 0), (cols - 1, rows - 1)])
+
+
 class Engine:
     """Runs the game: window, Pac-Man sprite, input and the main loop.
 
@@ -105,7 +114,12 @@ class Engine:
         self.pac_img = self._load_sprite(PAC_SPRITE)
 
         spawn_col, spawn_row = find_spawn(maze)
-        self.pacman = PacMan(spawn_col, spawn_row)
+        red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
+        self.pacman = PacMan(spawn_col, spawn_row, PAC_SPRITE)
+        self.ghosts = [RedGhost(red_pos[0], red_pos[1], GHOST_RED_SPRITE, self.pacman.pos),
+                       BlueGhost(blue_pos[0], blue_pos[1], GHOST_BLUE_SPRITE, self.pacman.pos),
+                       OrangeGhost(orange_pos[0], orange_pos[1], GHOST_ORANGE_SPRITE, self.pacman.pos),
+                       PurpuleGhost(pink_pos[0], pink_pos[1], GHOST_PINK_SPRITE, self.pacman.pos)]
 
         self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000)
         self.render_x = float(spawn_col * TAILLE_CASE)
@@ -145,34 +159,40 @@ class Engine:
             if event.type == pygame.QUIT:
                 return False
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
                 self.buffered_dir = KEY_TO_DIR.get(
                     event.key, self.buffered_dir)
         return True
 
     def _update(self, dt: float) -> None:
         """Advances Pac-Man: step on the grid, then slide toward the cell."""
-        target_x = self.pacman.pos.x * TAILLE_CASE
-        target_y = self.pacman.pos.y * TAILLE_CASE
+        for entity in Entity.entities:
+            print("\n\n", entity.pos.x, entity.pos.y)
+            target_x = entity.pos.x * TAILLE_CASE
+            target_y = entity.pos.y * TAILLE_CASE
+            print(entity.render_x, entity.render_y, target_x, target_y)
+            if entity.render_x == target_x and entity.render_y == target_y:
+                self._step(entity)
+                target_x = entity.pos.x * TAILLE_CASE
+                target_y = entity.pos.y * TAILLE_CASE
 
-        if self.render_x == target_x and self.render_y == target_y:
-            self._step()
-            target_x = self.pacman.pos.x * TAILLE_CASE
-            target_y = self.pacman.pos.y * TAILLE_CASE
+            step = self.speed * dt
+            entity.render_x = _slide(entity.render_x, target_x, step)
+            entity.render_y = _slide(entity.render_y, target_y, step)
 
-        step = self.speed * dt
-        self.render_x = _slide(self.render_x, target_x, step)
-        self.render_y = _slide(self.render_y, target_y, step)
-
-    def _step(self) -> None:
+    def _step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
-        if self.buffered_dir and self.pacman.can_move(self.maze, self.buffered_dir):
-            self.current_dir = self.buffered_dir
-        if self.current_dir and self.pacman.can_move(self.maze, self.current_dir):
-            self.pacman.try_move(self.maze, self.current_dir)
+        print(entity.facing)
+        if self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
+            entity.facing = self.buffered_dir
+        if entity.facing and entity.can_move(self.maze, entity.facing):
+            entity.try_move(self.maze, entity.facing)
 
     def _draw(self) -> None:
-        """Draws the maze background and Pac-Man, then flips the frame."""
         self.screen.blit(self.maze_surface, (0, 0))
-        self.screen.blit(self.pac_img,
-                         (round(self.render_x), round(self.render_y)))
+        for entity in Entity.entities:
+            self.screen.blit(self._load_sprite(entity.sprite),
+                             (round(entity.render_x),
+                              round(entity.render_y)))
         pygame.display.flip()

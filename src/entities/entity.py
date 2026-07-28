@@ -14,8 +14,8 @@ class Entity:
     entities: List["Entity"] = []
 
     def __init__(self, pos_x: int, pos_y: int, hp: int,
-                 targetable: bool, speed: int = 1,
-                 player: bool = False, size: int = 8) -> None:
+                 targetable: bool, sprite: str, speed: int = 1,
+                 player: bool = False, size: int = 8, facing="N") -> None:
         """Initializes a new entity and registers it globally."""
         self.pos = Pos(pos_x, pos_y)
         self.init_pos = (pos_x, pos_y)
@@ -24,8 +24,12 @@ class Entity:
         self.speed = speed
         self.player = player
         self.size = size
+        self.facing = facing
         self.alive = True
         self.shortest_path: str | bool = False
+        self.sprite = sprite
+        self.render_x = float(pos_x * 40)
+        self.render_y = float(pos_y * 40)
         Entity.entities.append(self)
 
     def get_pos(self) -> Tuple[int, int]:
@@ -34,21 +38,20 @@ class Entity:
 
     def moove_up(self) -> None:
         """Moves the entity up by its speed."""
-        self.pos.up(self.speed)
+        self.pos.up(1)
 
     def moove_down(self) -> None:
         """Moves the entity down by its speed."""
-        self.pos.down(self.speed)
+        self.pos.down(1)
 
     def moove_left(self) -> None:
         """Moves the entity left by its speed."""
-        self.pos.left(self.speed)
+        self.pos.left(1)
 
     def moove_right(self) -> None:
         """Moves the entity right by its speed."""
-        self.pos.right(self.speed)
-    
-    
+        self.pos.right(1)
+
     def can_move(self, maze: List[List[int]], direction: str) -> bool:
         """Checks if moving in `direction` is possible (no wall, in bounds).
 
@@ -63,8 +66,7 @@ class Entity:
         if not (0 <= ny < len(maze) and 0 <= nx < len(maze[0])):
             return False
         return (maze[y][x] & CODE_DIR[direction]) == 0
-    
-    
+
     def try_move(self, maze: List[List[int]], direction: str) -> bool:
         """Moves the entity in `direction` if there is no wall. Returns True if moved."""
         if not self.can_move(maze, direction):
@@ -77,6 +79,7 @@ class Entity:
             self.moove_right()
         elif direction == "W":
             self.moove_left()
+        self.facing = direction
         return True
 
     def is_eaten(self, hunter: "Entity") -> bool:
@@ -104,7 +107,7 @@ class Entity:
         Entity.entities.clear()
 
     def find_short_path(self, maze: List[List[int]],
-                         target: Tuple[int, int]) -> None:
+                        target: Tuple[int, int]) -> None:
         """Computes the shortest path (BFS) from this entity to target."""
         moves = [(0, -1, 1, 'N'), (1, 0, 2, 'E'),
                  (0, 1, 4, 'S'), (-1, 0, 8, 'W')]
@@ -142,4 +145,4 @@ class Entity:
         """Returns the euclidean distance between two points."""
         x_o, y_o = origin
         x_t, y_t = target
-        return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)   
+        return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)

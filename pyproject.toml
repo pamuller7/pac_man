@@ -5,7 +5,6 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "mazegenerator @ file:///home/mobenais/Documents/pac_man/mazegenerator-2.1.0-py3-none-any.whl",
     "Pillow",
     "pygame"
     ]
