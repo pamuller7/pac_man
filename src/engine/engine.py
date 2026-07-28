@@ -184,7 +184,7 @@ class Engine:
     def _step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
         print(entity.facing)
-        if self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
+        if entity.player and self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
             entity.facing = self.buffered_dir
         if entity.facing and entity.can_move(self.maze, entity.facing):
             entity.try_move(self.maze, entity.facing)
