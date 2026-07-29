@@ -14,21 +14,29 @@ class Ghost(Entity):
         self.target_tile = (0, 0)
         self.mooves = [('N', 0, -1), ('W', -1, 0), ('S', 0, 1), ('E', 1, 0)]
         self.pac_man_pos = pac_man_pos
-        self.chase = False
+        self.normal_behaviour = True
         self.speed = speed
         self.chase_limit = 10
-        self.chill = self.chase_limit * 3
-        self.chasing_since = time()
-    
-    def center_else_far(self):
-        dist = self.get_dist(self.pos.get_pos(), self.pac_man_pos.get_pos())
-        if dist > 5:
-            self.tracking()
-        else:
-            self.run_away()
+        self.chill = self.chase_limit
+        self.chase_swich = time()
+        self.dist_from_pac_man = 0.0
+
+    def switch_state(self):
+        self.normal_behaviour = not self.normal_behaviour
+        self.chase_swich = time()
+
+    def update_entity(self):
+        if self.normal_behaviour:
+            if time() - self.chase_swich > self.chase_limit:
+                self.switch_state()
+        if not self.normal_behaviour:
+            if time() - self.chase_swich > self.chill:
+                self.switch_state()
+        self.dist_from_pac_man = self.get_dist(self.pos.get_pos(),
+                                               self.pac_man_pos.get_pos())
 
     def run_away(self):
-        """Choisit comme cible le coin le plus proche de Pac-Man."""
+        """Choisit comme cible le coin le plus loin de Pac-Man."""
         px, py = self.pac_man_pos.get_pos()
         corners = [
             (0, 0),
@@ -50,16 +58,12 @@ class Ghost(Entity):
         self.target_tile = self.pac_man_pos.get_pos()
         return (self.target_tile)
 
-    def going_b4_pac_man(self):
-        dist = self.get_dist(self.pos.get_pos(), self.pac_man_pos.get_pos())
-        if dist > 10:
-            self.tracking()
-            return (self.target_tile)
+    def going_b4_pac_man(self, sign=1):
         x, y = self.pac_man_pos.get_pos()
         for facing, moove_x, moove_y in self.mooves:
             if self.pac_man_pos.get_facing() == facing:
-                new_pos_x = x + moove_x * 4
-                new_pos_y = y + moove_y * 4
+                new_pos_x = x + sign * moove_x * 4
+                new_pos_y = y + sign * moove_y * 4
                 if new_pos_x >= 0:
                     choose_x = min(new_pos_x, 19)
                 else:
@@ -75,14 +79,6 @@ class Ghost(Entity):
         self.target_tile = (random.randint(0, 19), random.randint(0, 19))
         return (self.target_tile)
 
-    def going_to_pac_man_if_far(self):
-        dist = self.get_dist(self.pos.get_pos(), self.pac_man_pos.get_pos())
-        if dist < 9:
-            self.run_away()
-        else:
-            self.random_dir()
-        return (self.target_tile)
-
 
 class RedGhost(Ghost):
     def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
@@ -96,7 +92,10 @@ class RedGhost(Ghost):
         if self.hp <= 0:
             self.go_spawn()
             return
-        self.tracking()
+        if self.normal_behaviour:
+            self.tracking()
+        else:
+            self.random_dir()
 
 
 class BlueGhost(Ghost):
@@ -112,8 +111,15 @@ class BlueGhost(Ghost):
         if self.hp <= 0:
             self.go_spawn()
             return
-        self.going_to_pac_man_if_far()
-        return (self.target_tile)
+        if self.normal_behaviour:
+            pac_x, pac_y = self.pac_man_pos.get_pos()
+            red_x, red_y = self.ghosts['red'].pos.get_pos()
+            if (pac_x - red_x) < 0 or (pac_y - red_y) < 0:
+                self.going_b4_pac_man()
+            else:
+                self.going_b4_pac_man(-1)
+        else:
+            self.random_dir()
 
 
 class OrangeGhost(Ghost):
@@ -129,7 +135,15 @@ class OrangeGhost(Ghost):
         if self.hp <= 0:
             self.go_spawn()
             return
-        self.center_else_far()
+        if self.normal_behaviour:
+            if self.dist_from_pac_man > 10:
+                self.target_tile = (10, 9)
+            elif self.dist_from_pac_man <= 2:
+                self.tracking()
+            else:
+                self.run_away()
+        else:
+            self.random_dir()
 
 
 class PurpuleGhost(Ghost):

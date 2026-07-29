@@ -127,7 +127,6 @@ class Engine:
                        PurpuleGhost(pink_pos[0], pink_pos[1],
                                     GHOST_PINK_SPRITE, self.pacman.pos)]
         self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000) - 80
-        print(self.speed)
         self.render_x = float(spawn_col * TAILLE_CASE)
         self.render_y = float(spawn_row * TAILLE_CASE)
         self.current_dir: str | None = None
@@ -174,6 +173,7 @@ class Engine:
     def _update(self, dt: float) -> None:
         """Advances Pac-Man: step on the grid, then slide toward the cell."""
         for entity in Entity.entities:
+            entity.update_entity()
             entity.check_eaten()
             target_x = entity.pos.x * TAILLE_CASE
             target_y = entity.pos.y * TAILLE_CASE
@@ -183,7 +183,6 @@ class Engine:
                 target_y = entity.pos.y * TAILLE_CASE
 
             step = entity.speed
-            print(step, entity)
             entity.render_x = _slide(entity.render_x, target_x, step)
             entity.render_y = _slide(entity.render_y, target_y, step)
 

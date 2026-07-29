@@ -26,14 +26,13 @@ class Entity:
         self.player = player
         self.size = size
         self.facing = facing
-        self.invisibility_time = 20
         self.alive = True
         self.speed = speed
         self.shortest_path: str | bool = False
         self.sprite = sprite
         self.render_x = float(pos_x * 40)
         self.render_y = float(pos_y * 40)
-        Entity.entities.append(self)
+        self.entities.append(self)
 
     def get_pos(self) -> Tuple[int, int]:
         """Returns the entity's current position as (x, y)."""
@@ -72,9 +71,6 @@ class Entity:
 
     def try_move(self, maze: List[List[int]], direction: str) -> bool:
         """Moves the entity in `direction` if there is no wall. Returns True if moved."""
-        if self.player:
-            print(self.pos.get_pos())
-            print(self.hp)
         if not self.can_move(maze, direction):
             return False
         if direction == "N":
@@ -88,10 +84,10 @@ class Entity:
         self.facing = direction
         return True
 
-    @staticmethod
-    def check_eaten():
-        for entity1 in Entity.entities:
-            for entity2 in Entity.entities:
+    @classmethod
+    def check_eaten(cls):
+        for entity1 in cls.entities:
+            for entity2 in cls.entities:
                 if entity1 == entity2:
                     continue
                 if entity1.pos.get_pos() == entity2.pos.get_pos():
@@ -102,6 +98,8 @@ class Entity:
         if self.targetable and not hunter.targetable:
             self.hp -= 1
             self.targetable = False
+            print("HERE")
+            hunter.switch_state()
             if self.hp <= 0:
                 self.alive = False
             return True
