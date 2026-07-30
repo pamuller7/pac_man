@@ -74,7 +74,11 @@ class Entity:
         return (maze[y][x] & CODE_DIR[direction]) == 0
 
     def try_move(self, maze: List[List[int]], direction: str) -> bool:
-        """Moves the entity in `direction` if there is no wall. Returns True if moved."""
+        """
+        Moves the entity 
+        in `direction` if there is no wall. 
+        Returns True if moved.
+        """
         if not self.can_move(maze, direction):
             return False
         if direction == "N":

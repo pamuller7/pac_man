@@ -1,8 +1,11 @@
 class Pos:
     def __init__(self, x: int, y: int):
+        """
+        N, E, S, W, decrit la direction a laquaelle il fait face (pour ghost)
+        """
         self.x = x
         self.y = y
-        self.facing = "N" # N, E, S, W, decrit la direction a laquaelle il fait face (pour ghost)
+        self.facing = "N"
 
     def up(self, moove: int = 1):
         self.y -= moove

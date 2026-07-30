@@ -24,6 +24,7 @@ clean:
 
 lint:
 	@echo "linting..."
+	flake8 src
 
 
 lint-strict:

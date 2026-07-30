@@ -10,10 +10,14 @@ class PacMan(Entity):
         self.god_mod = False
         self.chase_swich = time()
         self.assets = {
-            "N": ["assets/pac_man/up/up_1.png", "assets/pac_man/up/up_2.png"],
-            "S": ["assets/pac_man/down/down_1.png", "assets/pac_man/down/down_2.png"],
-            "W": ["assets/pac_man/left/left_1.png", "assets/pac_man/left/left_2.png"],
-            "E": ["assets/pac_man/right/right_1.png", "assets/pac_man/right/right_2.png"],
+            "N": ["assets/pac_man/up/up_1.png", 
+                  "assets/pac_man/up/up_2.png"],
+            "S": ["assets/pac_man/down/down_1.png", 
+                  "assets/pac_man/down/down_2.png"],
+            "W": ["assets/pac_man/left/left_1.png", 
+                  "assets/pac_man/left/left_2.png"],
+            "E": ["assets/pac_man/right/right_1.png", 
+                  "assets/pac_man/right/right_2.png"],
         }
 
     def update_entity(self, frame_count):

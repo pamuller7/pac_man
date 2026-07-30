@@ -2,7 +2,13 @@ import os
 
 import pygame
 
-from ..entities import PacMan, Entity, RedGhost, BlueGhost, OrangeGhost, PurpuleGhost, Pacgum
+from ..entities import (PacMan, 
+                        Entity, 
+                        RedGhost, 
+                        BlueGhost, 
+                        OrangeGhost, 
+                        PurpuleGhost, 
+                        Pacgum)
 from ..error import (
     AssetError,
     AssetNotFoundError,
@@ -130,15 +136,17 @@ class Engine:
                         check_super = True
                         score = 200
                     Pacgum(x, y, check_super, score)
-        self.pacman = PacMan(spawn_col, spawn_row, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1))
+        maze_infos = (len(maze) - 1, len(maze[0]) - 1)
+        self.pacman = PacMan(spawn_col, spawn_row, 
+                             maze_infos=maze_infos)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
-                                self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1)),
+                                self.pacman.pos, maze_infos=maze_infos),
                        BlueGhost(blue_pos[0], blue_pos[1],
-                                 self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1)),
+                                 self.pacman.pos, maze_infos=maze_infos),
                        OrangeGhost(orange_pos[0], orange_pos[1],
-                                   self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1)),
+                                   self.pacman.pos, maze_infos=maze_infos),
                        PurpuleGhost(pink_pos[0], pink_pos[1],
-                                    self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1))]
+                                    self.pacman.pos, maze_infos=maze_infos)]
         self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000) - 80
         self.render_x = float(spawn_col * TAILLE_CASE)
         self.render_y = float(spawn_row * TAILLE_CASE)
@@ -186,7 +194,9 @@ class Engine:
         return True
 
     def _update(self, dt: float) -> None:
-        """Advances Pac-Man: step on the grid, then slide toward the cell."""
+        """
+        Advances Pac-Man: step on the grid, then slide toward the cell.
+        """
         Pacgum.check_eaten(self.pacman)
         for entity in Entity.entities:
             entity.update_entity(self.frame_count)
@@ -204,7 +214,7 @@ class Engine:
 
     def _step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
-        if entity.player and self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
+        if (entity.player and self.buffered_dir and entity.can_move(self.maze, self.buffered_dir)):
             entity.facing = self.buffered_dir
         elif not entity.player:
             entity.find_target_tile()
