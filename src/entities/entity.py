@@ -9,27 +9,31 @@ from time import time
 CODE_DIR = {"N": 1, "E": 2, "S": 4, "W": 8}
 DELTA_DIR = {"N": (0, -1), "E": (1, 0), "S": (0, 1), "W": (-1, 0)}
 
+
 class Entity:
     """Base class for any movable game entity (Pac-Man, ghosts)."""
 
     entities: List["Entity"] = []
 
     def __init__(self, pos_x: int, pos_y: int, hp: int,
-                 targetable: bool, sprite: str, speed: int = 2,
+                 targetable: bool, maze_infos: tuple, speed: int = 2,
                  player: bool = False, size: int = 8, facing="N") -> None:
         """Initializes a new entity and registers it globally."""
         self.pos = Pos(pos_x, pos_y)
         self.init_pos = (pos_x, pos_y)
         self.hp = hp
+        self.maze_infos = maze_infos
         self.targetable = targetable
+        self.tick = 0
         self.speed = speed
+        self.super_duration = 5
         self.player = player
         self.size = size
         self.facing = facing
         self.alive = True
         self.speed = speed
         self.shortest_path: str | bool = False
-        self.sprite = sprite
+        self.sprite = ""
         self.render_x = float(pos_x * 40)
         self.render_y = float(pos_y * 40)
         self.entities.append(self)
@@ -84,22 +88,16 @@ class Entity:
         self.facing = direction
         return True
 
-    @classmethod
-    def check_eaten(cls):
-        for entity1 in cls.entities:
-            for entity2 in cls.entities:
-                if entity1 == entity2:
-                    continue
-                if entity1.pos.get_pos() == entity2.pos.get_pos():
-                    entity1.is_eaten(entity2)
-
     def is_eaten(self, hunter: "Entity") -> bool:
         """Checks if this entity is eaten by the hunter entity."""
-        if self.targetable and not hunter.targetable:
+        if (
+            self.targetable and not hunter.targetable
+            and (self.player and not hunter.player
+                 or hunter.player and not self.player)):
             self.hp -= 1
             self.targetable = False
-            print("HERE")
-            hunter.switch_state()
+            if not hunter.player:
+                hunter.switch_state()
             if self.hp <= 0:
                 self.alive = False
             return True
@@ -108,17 +106,7 @@ class Entity:
     def swich_mode(self) -> None:
         """Toggles this entity's targetable state."""
         self.targetable = not self.targetable
-
-    @staticmethod
-    def swich_mode_all() -> None:
-        """Toggles targetable state for every registered entity."""
-        for entity in Entity.entities:
-            entity.swich_mode()
-
-    @staticmethod
-    def reset_all() -> None:
-        """Clears the global entity registry (new game/level)."""
-        Entity.entities.clear()
+        self.chase_swich = time()
 
     def find_short_path(self, maze: List[List[int]],
                         target: Tuple[int, int]) -> None:
@@ -153,6 +141,26 @@ class Entity:
             cur = parent
         self.shortest_path = ''.join(reversed(letters))
 
+    @classmethod
+    def pac_man_hunting(cls):
+        for entity in cls.entities:
+            if entity.player:
+                entity.targetable = False
+            else:
+                entity.targetable = True
+            entity.chase_swich = time()
+
+    @classmethod
+    def swich_mode_all(cls) -> None:
+        """Toggles targetable state for every registered entity."""
+        for entity in cls.entities:
+            entity.swich_mode()
+
+    @classmethod
+    def reset_all(cls) -> None:
+        """Clears the global entity registry (new game/level)."""
+        cls.entities.clear()
+
     @staticmethod
     def get_dist(origin: Tuple[int, int],
                  target: Tuple[int, int]) -> float:
@@ -160,3 +168,12 @@ class Entity:
         x_o, y_o = origin
         x_t, y_t = target
         return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)
+
+    @classmethod
+    def check_eaten(cls):
+        for entity1 in cls.entities:
+            for entity2 in cls.entities:
+                if entity1 == entity2:
+                    continue
+                if (entity1.pos.get_pos() == entity2.pos.get_pos()):
+                    entity1.is_eaten(entity2)

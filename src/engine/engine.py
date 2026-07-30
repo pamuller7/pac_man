@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from ..entities import PacMan, Entity, RedGhost, BlueGhost, OrangeGhost, PurpuleGhost
+from ..entities import PacMan, Entity, RedGhost, BlueGhost, OrangeGhost, PurpuleGhost, Pacgum
 from ..error import (
     AssetError,
     AssetNotFoundError,
@@ -110,22 +110,35 @@ class Engine:
         height = len(maze) * TAILLE_CASE
         width = len(maze[0]) * TAILLE_CASE
         self.screen = pygame.display.set_mode((width, height))
+        self.frame_count = 0
         self.clock = pygame.time.Clock()
 
         self.maze_surface = draw_maze(maze)
-        self.pac_img = self._load_sprite(PAC_SPRITE)
+        # self.pac_img = self._load_sprite(PAC_SPRITE)
 
         spawn_col, spawn_row = find_spawn(maze)
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
-        self.pacman = PacMan(spawn_col, spawn_row, PAC_SPRITE)
+        for y, line in enumerate(maze):
+            for x, cell in enumerate(line):
+                if cell != 15:
+                    check_super = False
+                    score = 100
+                    if (
+                        x in [0, len(maze[0]) - 1]
+                        and y in [0, len(maze[0]) - 1]
+                    ):
+                        check_super = True
+                        score = 200
+                    Pacgum(x, y, check_super, score)
+        self.pacman = PacMan(spawn_col, spawn_row, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1))
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
-                                GHOST_RED_SPRITE, self.pacman.pos),
+                                self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1)),
                        BlueGhost(blue_pos[0], blue_pos[1],
-                                 GHOST_BLUE_SPRITE, self.pacman.pos),
+                                 self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1)),
                        OrangeGhost(orange_pos[0], orange_pos[1],
-                                   GHOST_ORANGE_SPRITE, self.pacman.pos),
+                                   self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1)),
                        PurpuleGhost(pink_pos[0], pink_pos[1],
-                                    GHOST_PINK_SPRITE, self.pacman.pos)]
+                                    self.pacman.pos, maze_infos=(len(self.maze) - 1, len(self.maze[0]) - 1))]
         self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000) - 80
         self.render_x = float(spawn_col * TAILLE_CASE)
         self.render_y = float(spawn_row * TAILLE_CASE)
@@ -133,7 +146,7 @@ class Engine:
         self.buffered_dir: str | None = None
 
     @staticmethod
-    def _load_sprite(path: str) -> pygame.Surface:
+    def _load_sprite(path: str, div: int = 1) -> pygame.Surface:
         """Loads and scales a sprite to one cell.
 
         Raises:
@@ -146,13 +159,15 @@ class Engine:
             image = pygame.image.load(path).convert_alpha()
         except pygame.error as exc:
             raise AssetError(path, str(exc)) from exc
-        return pygame.transform.scale(image, (TAILLE_CASE, TAILLE_CASE))
+        dim = (TAILLE_CASE//div, TAILLE_CASE//div)
+        return pygame.transform.scale(image, dim)
 
     def run(self) -> None:
         """Main loop: read time, read keys, move Pac-Man, draw."""
         running = True
         while running:
-            dt = self.clock.tick(60) / 1000
+            self.frame_count = (self.frame_count + 1) % 10
+            dt = self.clock.tick(60) / 10
             running = self._handle_events()
             self._update(dt)
             self._draw()
@@ -172,8 +187,9 @@ class Engine:
 
     def _update(self, dt: float) -> None:
         """Advances Pac-Man: step on the grid, then slide toward the cell."""
+        Pacgum.check_eaten(self.pacman)
         for entity in Entity.entities:
-            entity.update_entity()
+            entity.update_entity(self.frame_count)
             entity.check_eaten()
             target_x = entity.pos.x * TAILLE_CASE
             target_y = entity.pos.y * TAILLE_CASE
@@ -182,7 +198,7 @@ class Engine:
                 target_x = entity.pos.x * TAILLE_CASE
                 target_y = entity.pos.y * TAILLE_CASE
 
-            step = entity.speed
+            step = entity.speed * dt
             entity.render_x = _slide(entity.render_x, target_x, step)
             entity.render_y = _slide(entity.render_y, target_y, step)
 
@@ -204,4 +220,13 @@ class Engine:
             self.screen.blit(self._load_sprite(entity.sprite),
                              (round(entity.render_x),
                               round(entity.render_y)))
+        for gums in Pacgum.pacgums.values():
+            if not gums.super_pacgum:
+                div = 3
+            else:
+                div = 2
+            sprite = self._load_sprite(gums.sprite, div)
+            x = gums.render_x + (TAILLE_CASE - sprite.get_width()) // 2
+            y = gums.render_y + (TAILLE_CASE - sprite.get_height()) // 2
+            self.screen.blit(sprite, (x, y))
         pygame.display.flip()

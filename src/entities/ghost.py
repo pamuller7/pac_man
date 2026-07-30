@@ -3,13 +3,15 @@ from .pos import Pos
 import random
 from time import time
 
+SCARED = ["assets/scared_ghost/scared_1.png", "assets/scared_ghost/scared_2.png"]
+
 
 class Ghost(Entity):
     ghosts = dict()
 
-    def __init__(self, pos_x: int, pos_y: int, sprite: str, pac_man_pos: Pos,
+    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos, maze_infos,
                  hp: int = 1, targetable: bool = False, speed=2.7):
-        super().__init__(pos_x, pos_y, hp, targetable, sprite,
+        super().__init__(pos_x, pos_y, hp, targetable, maze_infos,
                          speed, player=False, size=8)
         self.target_tile = (0, 0)
         self.mooves = [('N', 0, -1), ('W', -1, 0), ('S', 0, 1), ('E', 1, 0)]
@@ -25,24 +27,56 @@ class Ghost(Entity):
         self.normal_behaviour = not self.normal_behaviour
         self.chase_swich = time()
 
-    def update_entity(self):
-        if self.normal_behaviour:
+    def find_target_tile(self):
+        """
+            Son ciblage dépend à la fois de la position de Rouge et de Pac-Man,
+            (on va dire qu'il cible devant pac man si rouge derrier, derriere pac man sinon)
+        """
+        if self.hp <= 0:
+            self.go_spawn()
+            return
+        if self.normal_behaviour and not self.targetable:
+            self.nomal_proc()
+        elif not self.normal_behaviour and not self.targetable:
+            self.random_dir()
+        else:
+            self.run_away()
+
+    def update_entity(self, frame_count):
+        if self.hp <= 0 and self.pos.get_pos() == self.init_pos:
+            self.hp = 1
+            self.targetable = False
+        if self.hp <= 0:
+            print(self.hp)
+            self.targetable = True
+            self.sprite = self.assets["dead"]
+        elif self.targetable:
+            self.sprite = self.assets['swich'][self.tick]
+        else:
+            self.sprite = self.assets[self.facing][self.tick]
+        if frame_count == 0:
+            self.tick = (self.tick + 1) % 2
+        if self.normal_behaviour and not self.targetable:
             if time() - self.chase_swich > self.chase_limit:
                 self.switch_state()
-        if not self.normal_behaviour:
+        elif not self.normal_behaviour and not self.targetable:
             if time() - self.chase_swich > self.chill:
                 self.switch_state()
+        elif self.targetable:
+            if time() - self.chase_swich > self.super_duration:
+                self.targetable = False
         self.dist_from_pac_man = self.get_dist(self.pos.get_pos(),
                                                self.pac_man_pos.get_pos())
 
     def run_away(self):
         """Choisit comme cible le coin le plus loin de Pac-Man."""
         px, py = self.pac_man_pos.get_pos()
+        max_x_maze, max_y_maze = self.maze_infos
         corners = [
             (0, 0),
-            (19, 0),
-            (0, 19),
-            (19, 19),
+            (max_x_maze, 0),
+            (0, max_y_maze),
+            (max_x_maze, max_y_maze),
         ]
         self.target_tile = max(
             corners,
@@ -81,81 +115,106 @@ class Ghost(Entity):
 
 
 class RedGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
+    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+        super().__init__(pos_x=pos_x,
+                         pos_y=pos_y,
+                         pac_man_pos=pac_man_pos,
+                         maze_infos=maze_infos,
+                         speed=speed)
         Ghost.ghosts.update({"red": self})
+        self.assets = {
+            "swich": SCARED,
+            "dead": "assets/dead_ghost/dead.png",
+            "N": ["assets/ghost_red/up/up_1.png", "assets/ghost_red/up/up_2.png"],
+            "S": ["assets/ghost_red/down/down_1.png", "assets/ghost_red/down/down_2.png"],
+            "W": ["assets/ghost_red/left/left_1.png", "assets/ghost_red/left/left_2.png"],
+            "E": ["assets/ghost_red/right/right_1.png", "assets/ghost_red/right/right_2.png"],
+        }
 
-    def find_target_tile(self):
+    def nomal_proc(self):
         """
             Sa cible est toujours la case exacte où se trouve Pac-Man
         """
-        if self.hp <= 0:
-            self.go_spawn()
-            return
-        if self.normal_behaviour:
-            self.tracking()
-        else:
-            self.random_dir()
+        self.tracking()
 
 
 class BlueGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
+    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+        super().__init__(pos_x=pos_x,
+                         pos_y=pos_y,
+                         pac_man_pos=pac_man_pos,
+                         maze_infos=maze_infos,
+                         speed=speed)
         Ghost.ghosts.update({"blue": self})
+        self.assets = {
+            "swich": SCARED,
+            "dead": "assets/dead_ghost/dead.png",
+            "N": ["assets/ghost_blue/up/up_1.png", "assets/ghost_blue/up/up_2.png"],
+            "S": ["assets/ghost_blue/down/down_1.png", "assets/ghost_blue/down/down_2.png"],
+            "W": ["assets/ghost_blue/left/left_1.png", "assets/ghost_blue/left/left_2.png"],
+            "E": ["assets/ghost_blue/right/right_1.png", "assets/ghost_blue/right/right_2.png"],
+        }
 
-    def find_target_tile(self):
+    def nomal_proc(self):
         """
             Son ciblage dépend à la fois de la position de Rouge et de Pac-Man,
             (on va dire qu'il cible devant pac man si rouge derrier, derriere pac man sinon)
         """
-        if self.hp <= 0:
-            self.go_spawn()
-            return
-        if self.normal_behaviour:
-            pac_x, pac_y = self.pac_man_pos.get_pos()
-            red_x, red_y = self.ghosts['red'].pos.get_pos()
-            if (pac_x - red_x) < 0 or (pac_y - red_y) < 0:
-                self.going_b4_pac_man()
-            else:
-                self.going_b4_pac_man(-1)
+        pac_x, pac_y = self.pac_man_pos.get_pos()
+        red_x, red_y = self.ghosts['red'].pos.get_pos()
+        if (pac_x - red_x) < 0 or (pac_y - red_y) < 0:
+            self.going_b4_pac_man()
         else:
-            self.random_dir()
+            self.going_b4_pac_man(-1)
 
 
 class OrangeGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
+    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+        super().__init__(pos_x=pos_x,
+                         pos_y=pos_y,
+                         pac_man_pos=pac_man_pos,
+                         maze_infos=maze_infos,
+                         speed=speed)
         Ghost.ghosts.update({"orange": self})
+        self.assets = {
+            "swich": SCARED,
+            "dead": "assets/dead_ghost/dead.png",
+            "N": ["assets/ghost_orange/up/up_1.png", "assets/ghost_orange/up/up_2.png"],
+            "S": ["assets/ghost_orange/down/down_1.png", "assets/ghost_orange/down/down_2.png"],
+            "W": ["assets/ghost_orange/left/left_1.png", "assets/ghost_orange/left/left_2.png"],
+            "E": ["assets/ghost_orange/right/right_1.png", "assets/ghost_orange/right/right_2.png"],
+        }
 
-    def find_target_tile(self):
+    def nomal_proc(self):
         """
             Si Pac-Man est loin, il cible le centre du labyrinthe.
             S'il s'approche trop de Pac-Man, il fuit vers son coin d'origine
         """
-        if self.hp <= 0:
-            self.go_spawn()
-            return
-        if self.normal_behaviour:
-            if self.dist_from_pac_man > 10:
-                self.target_tile = (10, 9)
-            elif self.dist_from_pac_man <= 2:
-                self.tracking()
-            else:
-                self.run_away()
-        else:
-            self.random_dir()
+        if self.dist_from_pac_man > 10:
+            self.target_tile = (10, 9)
+        elif self.dist_from_pac_man <= 2:
+            self.tracking()
 
 
 class PurpuleGhost(Ghost):
-    def __init__(self, pos_x, pos_y, sprite, pac_man_pos, speed=2):
-        super().__init__(pos_x, pos_y, sprite, pac_man_pos, speed)
+    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+        super().__init__(pos_x=pos_x,
+                         pos_y=pos_y,
+                         pac_man_pos=pac_man_pos,
+                         maze_infos=maze_infos,
+                         speed=speed)
         Ghost.ghosts.update({"purpule": self})
+        self.assets = {
+            "swich": SCARED,
+            "dead": "assets/dead_ghost/dead.png",
+            "N": ["assets/ghost_pink/up/up_1.png", "assets/ghost_pink/up/up_2.png"],
+            "S": ["assets/ghost_pink/down/down_1.png", "assets/ghost_pink/down/down_2.png"],
+            "W": ["assets/ghost_pink/left/left_1.png", "assets/ghost_pink/left/left_2.png"],
+            "E": ["assets/ghost_pink/right/right_1.png", "assets/ghost_pink/right/right_2.png"],
+        }
 
-    def find_target_tile(self):
+    def nomal_proc(self):
         """
             Il cible 4 cases devant la direction que regarde Pac-Man
         """
-        if self.hp <= 0:
-            self.go_spawn()
-            return
         self.going_b4_pac_man()
