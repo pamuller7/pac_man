@@ -98,11 +98,18 @@ class Engine:
     """Runs the game: window, Pac-Man sprite, input and the main loop.
 
     The maze background is drawn by the renderer; the engine owns everything
-    that moves and the pygame lifecycle.
+    that moves. The window and the maze surface can be injected by the
+    caller so they survive from one game to the next.
     """
 
-    def __init__(self, maze: list[list[int]]) -> None:
-        """Sets up the pygame window, maze surface and Pac-Man.
+    def __init__(self, maze: list[list[int]],
+                 screen: pygame.Surface | None = None,
+                 maze_surface: pygame.Surface | None = None) -> None:
+        """Sets up the maze surface and Pac-Man.
+
+        Creates the window only if no `screen` is given, and rebuilds the
+        maze surface only if no `maze_surface` is given, so several games
+        in a row can share both instead of redoing them.
 
         Raises:
             MazeError: if the maze is empty, not rectangular or has bad cells.
@@ -116,13 +123,15 @@ class Engine:
         pygame.init()
         pygame.display.set_caption("ᗧ Pac-Man ᗧ")
 
-        height = len(maze) * TAILLE_CASE
-        width = len(maze[0]) * TAILLE_CASE
-        self.screen = pygame.display.set_mode((width, height))
+        if screen is None:
+            height = len(maze) * TAILLE_CASE
+            width = len(maze[0]) * TAILLE_CASE
+            screen = pygame.display.set_mode((width, height))
+        self.screen = screen
         self.frame_count = 0
         self.clock = pygame.time.Clock()
 
-        self.maze_surface = draw_maze(maze)
+        self.maze_surface = maze_surface or draw_maze(maze)
         # self.pac_img = self._load_sprite(PAC_SPRITE)
 
         spawn_col, spawn_row = find_spawn(maze)

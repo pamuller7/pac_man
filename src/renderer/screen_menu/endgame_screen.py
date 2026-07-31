@@ -1,5 +1,5 @@
 import pygame
-from ..display import draw_rect_pixel, NOIR, JAUNE
+from ..display import NOIR, JAUNE
 
 def display_endgame(screen: pygame.Surface, score: int = 0) -> bool:
     """Displays the endgame screen. Returns True if the player restarts."""
@@ -10,8 +10,8 @@ def display_endgame(screen: pygame.Surface, score: int = 0) -> bool:
 
     screen.fill(NOIR)
     largeur, hauteur = 400, 200
-    draw_rect_pixel(screen, centre_x - largeur // 2,
-                    centre_y - hauteur // 2, largeur, hauteur)
+    # draw_rect_pixel(screen, centre_x - largeur // 2,
+    #                 centre_y - hauteur // 2, largeur, hauteur)
 
     text = font.render("GAME OVER", True, JAUNE)
     screen.blit(text, text.get_rect(center=(centre_x, centre_y - 45)))
@@ -19,7 +19,7 @@ def display_endgame(screen: pygame.Surface, score: int = 0) -> bool:
     text_score = font_small.render(f"SCORE : {score}", True, JAUNE)
     screen.blit(text_score, text_score.get_rect(center=(centre_x, centre_y)))
 
-    hint = font_small.render("  ESPACE : REJOUER   -   ECHAP : QUITTER  ",
+    hint = font_small.render("ESPACE : REJOUER   -   ECHAP : QUITTER",
                              True, JAUNE)
     screen.blit(hint, hint.get_rect(center=(centre_x, centre_y + 50)))
     pygame.display.flip()

@@ -12,7 +12,7 @@ class Ghost(Entity):
     ghosts = dict()
 
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos, maze_infos,
-                 hp: int = 1, targetable: bool = False, speed=2.7):
+                 hp: int = 1, targetable: bool = False, speed=1):
         super().__init__(pos_x, pos_y, hp, targetable, maze_infos,
                          speed, player=False, size=8)
         self.target_tile = (0, 0)

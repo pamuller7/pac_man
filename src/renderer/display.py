@@ -6,27 +6,27 @@ JAUNE = (255, 255, 0)
 NOIR = (0, 0, 0)
 EPAISSEUR = 3
 
-def draw_rect_pixel(surface: pygame.Surface,
-                    start_x: int, start_y: int,
-                    largeur: int, hauteur: int,
-                    couleur_bord: tuple = JAUNE,
-                    couleur_fond: tuple = NOIR,
-                    epaisseur: int = EPAISSEUR) -> None:
-    """Draws one rectangle onto the surface, pixel by pixel."""
-    surface.lock()
-    for i in range(hauteur):
-        for j in range(largeur):
-            couleur = couleur_fond
-            if i < epaisseur:
-                couleur = couleur_bord
-            elif i >= hauteur - epaisseur:
-                couleur = couleur_bord
-            elif j < epaisseur:
-                couleur = couleur_bord
-            elif j >= largeur - epaisseur:
-                couleur = couleur_bord
-            surface.set_at((start_x + j, start_y + i), couleur)
-    surface.unlock()
+# def draw_rect_pixel(surface: pygame.Surface,
+#                     start_x: int, start_y: int,
+#                     largeur: int, hauteur: int,
+#                     couleur_bord: tuple = JAUNE,
+#                     couleur_fond: tuple = NOIR,
+#                     epaisseur: int = EPAISSEUR) -> None:
+#     """Draws one rectangle onto the surface, pixel by pixel."""
+#     surface.lock()
+#     for i in range(hauteur):
+#         for j in range(largeur):
+#             couleur = couleur_fond
+#             if i < epaisseur:
+#                 couleur = couleur_bord
+#             elif i >= hauteur - epaisseur:
+#                 couleur = couleur_bord
+#             elif j < epaisseur:
+#                 couleur = couleur_bord
+#             elif j >= largeur - epaisseur:
+#                 couleur = couleur_bord
+#             surface.set_at((start_x + j, start_y + i), couleur)
+#     surface.unlock()
 
 
 def draw_cell(surface: pygame.Surface, col: int, ligne: int,

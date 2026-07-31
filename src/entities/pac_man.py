@@ -5,7 +5,7 @@ from time import time
 class PacMan(Entity):
     def __init__(self, pos_x, pos_y, maze_infos, hp=1, targetable=True):
         super().__init__(pos_x, pos_y, hp, targetable, maze_infos,
-                         speed=3, player=True, size=8)
+                         speed=2, player=True, size=8)
         self.score = 0
         self.god_mod = False
         self.isdead = False
