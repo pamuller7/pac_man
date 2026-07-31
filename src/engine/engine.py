@@ -19,7 +19,7 @@ from ..error import (
     MalformedMazeError,
     NoSpawnError,
 )
-from ..renderer import TAILLE_CASE, draw_maze, display_endgame
+from ..renderer import TAILLE_CASE, HUD_HEIGHT, draw_maze, display_endgame
 
 PAC_SPRITE = "assets/pacman.png"
 GHOST_BLUE_SPRITE = "assets/ghost_blue.png"
@@ -28,7 +28,6 @@ GHOST_PINK_SPRITE = "assets/ghost_pink.png"
 GHOST_RED_SPRITE = "assets/ghost_red.png"
 
 MOVE_INTERVAL = 150
-
 
 KEY_TO_DIR = {
     pygame.K_UP: "N", pygame.K_w: "N",
@@ -122,18 +121,14 @@ class Engine:
         self.maze = maze
         pygame.init()
         pygame.display.set_caption("ᗧ Pac-Man ᗧ")
-
         if screen is None:
-            height = len(maze) * TAILLE_CASE
+            height = len(maze) * TAILLE_CASE + HUD_HEIGHT
             width = len(maze[0]) * TAILLE_CASE
             screen = pygame.display.set_mode((width, height))
         self.screen = screen
         self.frame_count = 0
         self.clock = pygame.time.Clock()
-
         self.maze_surface = maze_surface or draw_maze(maze)
-        # self.pac_img = self.load_sprite(PAC_SPRITE)
-
         spawn_col, spawn_row = find_spawn(maze)
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         for y, line in enumerate(maze):
@@ -143,14 +138,15 @@ class Engine:
                     score = 100
                     if (
                         x in [0, len(maze[0]) - 1]
-                        and y in [0, len(maze[0]) - 1]
+                        and y in [0, len(maze) - 1]
                     ):
                         check_super = True
                         score = 200
                     Pacgum(x, y, check_super, score)
-        maze_infos = (len(maze) - 1, len(maze[0]) - 1)
+        maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         self.pacman = PacMan(spawn_col, spawn_row,
-                             maze_infos=maze_infos)
+                             maze_infos=maze_infos,
+                             hp=3)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
                        BlueGhost(blue_pos[0], blue_pos[1],
@@ -159,10 +155,6 @@ class Engine:
                                    self.pacman.pos, maze_infos=maze_infos),
                        PurpuleGhost(pink_pos[0], pink_pos[1],
                                     self.pacman.pos, maze_infos=maze_infos)]
-        self.speed = TAILLE_CASE / (MOVE_INTERVAL / 1000) - 80
-        self.render_x = float(spawn_col * TAILLE_CASE)
-        self.render_y = float(spawn_row * TAILLE_CASE)
-        self.current_dir: str | None = None
         self.buffered_dir: str | None = None
 
     @staticmethod
@@ -187,12 +179,12 @@ class Engine:
         running = True
         replay = False
         while running:
-            self.frame_count = (self.frame_count + 1) % 10
-            dt = self.clock.tick(30) / 10
+            self.frame_count = (self.frame_count + 1) % 5
+            dt = self.clock.tick(60) / 10
             running = self._handle_events()
             self._update(dt)
-            self.draw()
-            if self.pacman.isdead:
+            self._draw()
+            if not self.pacman.alive:
                 replay = display_endgame(self.screen, self.pacman.score)
                 running = False
         return replay
@@ -230,7 +222,6 @@ class Engine:
 
     def step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
-        print(entity.facing)
 
         if (entity.player
                 and self.buffered_dir
@@ -244,12 +235,13 @@ class Engine:
         if entity.facing and entity.can_move(self.maze, entity.facing):
             entity.try_move(self.maze, entity.facing)
 
-    def draw(self) -> None:
-        self.screen.blit(self.maze_surface, (0, 0))
+    def _draw(self) -> None:
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(self.maze_surface, (0, HUD_HEIGHT))
         for entity in Entity.entities:
             self.screen.blit(self.load_sprite(entity.sprite),
                              (round(entity.render_x),
-                              round(entity.render_y)))
+                              round(entity.render_y + HUD_HEIGHT)))
         for gums in Pacgum.pacgums.values():
             if not gums.super_pacgum:
                 div = 3
@@ -257,6 +249,9 @@ class Engine:
                 div = 2
             sprite = self.load_sprite(gums.sprite, div)
             x = gums.render_x + (TAILLE_CASE - sprite.get_width()) // 2
-            y = gums.render_y + (TAILLE_CASE - sprite.get_height()) // 2
+            y = gums.render_y  + HUD_HEIGHT + (TAILLE_CASE - sprite.get_height()) // 2
             self.screen.blit(sprite, (x, y))
+        font = pygame.font.Font(None, 36)
+        texte = font.render(f"score: {self.pacman.score}, hp: {self.pacman.hp}", True, (255, 255, 255))  # Blanc
+        self.screen.blit(texte, (0, 0))
         pygame.display.flip()

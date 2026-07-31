@@ -5,6 +5,7 @@ N, E, S, W = 1, 2, 4, 8
 JAUNE = (255, 255, 0)
 NOIR = (0, 0, 0)
 EPAISSEUR = 3
+HUD_HEIGHT = 50
 
 _FONT_CACHE: dict[int, pygame.font.Font] = {}
 
@@ -76,7 +77,7 @@ def draw_cell(surface: pygame.Surface, col: int, ligne: int,
 
 def draw_maze(maze: list[list[int]]) -> pygame.Surface:
     """Builds the full maze as one static Surface (drawn once)."""
-    height = len(maze) * TAILLE_CASE
+    height = len(maze) * TAILLE_CASE + HUD_HEIGHT
     width = len(maze[0]) * TAILLE_CASE
     surface = pygame.Surface((width, height))
 

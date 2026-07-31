@@ -22,6 +22,9 @@ class Entity:
         self.pos = Pos(pos_x, pos_y)
         self.init_pos = (pos_x, pos_y)
         self.hp = hp
+        self.score = 200
+        self.respawn_time = 5
+        self.dead_since = 0
         self.maze_infos = maze_infos
         self.targetable = targetable
         self.tick = 0
@@ -94,18 +97,20 @@ class Entity:
 
     def is_eaten(self, hunter: "Entity") -> bool:
         """Checks if this entity is eaten by the hunter entity."""
+        bool = False
         if (
+            self.alive and
             self.targetable and not hunter.targetable
             and (self.player and not hunter.player
                  or hunter.player and not self.player)):
             self.hp -= 1
+            hunter.score += self.score
             self.targetable = False
-            if not hunter.player:
-                hunter.switch_state()
             if self.hp <= 0:
                 self.alive = False
-            return True
-        return False
+                self.dead_since = time()
+            bool = True
+        return bool
 
     def swich_mode(self) -> None:
         """Toggles this entity's targetable state."""
@@ -181,3 +186,9 @@ class Entity:
                     continue
                 if (entity1.pos.get_pos() == entity2.pos.get_pos()):
                     entity1.is_eaten(entity2)
+                    if not entity2.player and entity1.player:
+                        entity2.normal_behaviour = False
+                        entity2.chase_swich = time()
+                    elif not entity1.player and entity2.player:
+                        entity1.normal_behaviour = False
+                        entity1.chase_swich = time()
