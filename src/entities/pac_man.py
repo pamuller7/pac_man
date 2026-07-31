@@ -31,7 +31,7 @@ class PacMan(Entity):
             if time() - self.chase_swich > self.super_duration:
                 self.swich_mode()
         if self.hp <= 0:
-            print("GAME OVER")
+            # print("GAME OVER")
             self.isdead = True
 
     def is_eaten(self, hunter: "Entity") -> bool:

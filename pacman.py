@@ -13,7 +13,7 @@ def new_maze() -> list[list[int]]:
 
 
 maze = new_maze()
-height = len(maze) * 40
+height = len(maze) * 40 + 60
 width = len(maze[0]) * 40
 pygame.init()
 screen = pygame.display.set_mode((width, height))

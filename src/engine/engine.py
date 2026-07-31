@@ -38,7 +38,7 @@ KEY_TO_DIR = {
 }
 
 
-def _slide(value: float, target: float, step: float) -> float:
+def slide(value: float, target: float, step: float) -> float:
     """Moves `value` toward `target` by at most `step` pixels."""
     if value < target:
         return min(value + step, target)
@@ -132,7 +132,7 @@ class Engine:
         self.clock = pygame.time.Clock()
 
         self.maze_surface = maze_surface or draw_maze(maze)
-        # self.pac_img = self._load_sprite(PAC_SPRITE)
+        # self.pac_img = self.load_sprite(PAC_SPRITE)
 
         spawn_col, spawn_row = find_spawn(maze)
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
@@ -166,7 +166,7 @@ class Engine:
         self.buffered_dir: str | None = None
 
     @staticmethod
-    def _load_sprite(path: str, div: int = 1) -> pygame.Surface:
+    def load_sprite(path: str, div: int = 1) -> pygame.Surface:
         """Loads and scales a sprite to one cell.
 
         Raises:
@@ -188,10 +188,10 @@ class Engine:
         replay = False
         while running:
             self.frame_count = (self.frame_count + 1) % 10
-            dt = self.clock.tick(60) / 10
+            dt = self.clock.tick(30) / 10
             running = self._handle_events()
             self._update(dt)
-            self._draw()
+            self.draw()
             if self.pacman.isdead:
                 replay = display_endgame(self.screen, self.pacman.score)
                 running = False
@@ -220,15 +220,15 @@ class Engine:
             target_x = entity.pos.x * TAILLE_CASE
             target_y = entity.pos.y * TAILLE_CASE
             if entity.render_x == target_x and entity.render_y == target_y:
-                self._step(entity)
+                self.step(entity)
                 target_x = entity.pos.x * TAILLE_CASE
                 target_y = entity.pos.y * TAILLE_CASE
 
             step = entity.speed * dt
-            entity.render_x = _slide(entity.render_x, target_x, step)
-            entity.render_y = _slide(entity.render_y, target_y, step)
+            entity.render_x = slide(entity.render_x, target_x, step)
+            entity.render_y = slide(entity.render_y, target_y, step)
 
-    def _step(self, entity) -> None:
+    def step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
         print(entity.facing)
 
@@ -244,10 +244,10 @@ class Engine:
         if entity.facing and entity.can_move(self.maze, entity.facing):
             entity.try_move(self.maze, entity.facing)
 
-    def _draw(self) -> None:
+    def draw(self) -> None:
         self.screen.blit(self.maze_surface, (0, 0))
         for entity in Entity.entities:
-            self.screen.blit(self._load_sprite(entity.sprite),
+            self.screen.blit(self.load_sprite(entity.sprite),
                              (round(entity.render_x),
                               round(entity.render_y)))
         for gums in Pacgum.pacgums.values():
@@ -255,7 +255,7 @@ class Engine:
                 div = 3
             else:
                 div = 2
-            sprite = self._load_sprite(gums.sprite, div)
+            sprite = self.load_sprite(gums.sprite, div)
             x = gums.render_x + (TAILLE_CASE - sprite.get_width()) // 2
             y = gums.render_y + (TAILLE_CASE - sprite.get_height()) // 2
             self.screen.blit(sprite, (x, y))

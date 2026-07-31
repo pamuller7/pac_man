@@ -1,14 +1,13 @@
 import pygame
+from ..display import draw_text, JAUNE, NOIR
+
 
 def press_start(screen: pygame.Surface) -> None:
     """Displays a title screen and waits for any key press."""
-    font = pygame.font.Font(None, 60)
-    text = font.render("PRESS START", True, (255, 255, 0))
-    text_rect = text.get_rect(center=(screen.get_width() // 2,
-                                        screen.get_height() // 2))
+    centre = (screen.get_width() // 2, screen.get_height() // 2)
 
-    screen.fill((0, 0, 0))
-    screen.blit(text, text_rect)
+    screen.fill(NOIR)
+    draw_text(screen, "PRESS START", 60, centre, JAUNE)
     pygame.display.flip()
 
     waiting = True

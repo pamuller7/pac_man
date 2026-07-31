@@ -6,6 +6,31 @@ JAUNE = (255, 255, 0)
 NOIR = (0, 0, 0)
 EPAISSEUR = 3
 
+_FONT_CACHE: dict[int, pygame.font.Font] = {}
+
+
+def get_font(taille: int) -> pygame.font.Font:
+    """Returns a cached pygame Font for the given size."""
+    if taille not in _FONT_CACHE:
+        _FONT_CACHE[taille] = pygame.font.Font(None, taille)
+    return _FONT_CACHE[taille]
+
+
+def draw_text(surface: pygame.Surface, texte: str, taille: int,
+              position: tuple[int, int], couleur: tuple = JAUNE,
+              centre: bool = True) -> pygame.Rect:
+    """
+    Rends du texte et le blit sur la surface.
+    """
+    font = get_font(taille)
+    rendu = font.render(texte, True, couleur)
+    if centre:
+        rect = rendu.get_rect(center=position)
+    else:
+        rect = rendu.get_rect(topleft=position)
+    surface.blit(rendu, rect)
+    return rect
+
 # def draw_rect_pixel(surface: pygame.Surface,
 #                     start_x: int, start_y: int,
 #                     largeur: int, hauteur: int,
@@ -59,4 +84,3 @@ def draw_maze(maze: list[list[int]]) -> pygame.Surface:
         for j, valeur in enumerate(row):
             draw_cell(surface, j, i, valeur)
     return surface
-
