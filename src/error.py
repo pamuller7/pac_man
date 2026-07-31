@@ -13,7 +13,9 @@ class MazeError(PacManError):
 class EmptyMazeError(MazeError):
     """Raised when a maze has no rows or no columns."""
 
-    def __init__(self, message: str = "Maze is empty (no rows or columns).") -> None:
+    def __init__(self, 
+                 message: str = "Maze is empty (no rows or columns)."
+                 ) -> None:
         super().__init__(message)
 
 
@@ -31,7 +33,9 @@ class MalformedMazeError(MazeError):
 
 
 class InvalidCellError(MazeError):
-    """Raised when a maze cell holds a value outside the 0..15 bitmask range."""
+    """
+    Raised when a maze cell holds a value outside the 0..15 bitmask range.
+    """
 
     def __init__(self, value: int, pos: Tuple[int, int]) -> None:
         super().__init__(
@@ -45,7 +49,9 @@ class InvalidCellError(MazeError):
 class NoSpawnError(MazeError):
     """Raised when the maze has no walkable cell to spawn an entity on."""
 
-    def __init__(self, message: str = "No walkable cell found to spawn on.") -> None:
+    def __init__(self, 
+                 message: str = "No walkable cell found to spawn on."
+                 ) -> None:
         super().__init__(message)
 
 
@@ -53,7 +59,9 @@ class OutOfBoundsError(MazeError):
     """Raised when a position falls outside the maze grid."""
 
     def __init__(self, pos: Tuple[int, int], size: Tuple[int, int]) -> None:
-        super().__init__(f"Position {pos} is outside the maze of size {size}.")
+        super().__init__(
+            f"Position {pos} is outside the maze of size {size}."
+            )
         self.pos = pos
         self.size = size
 
@@ -63,7 +71,8 @@ class DirectionError(PacManError):
 
     def __init__(self, direction: str) -> None:
         super().__init__(
-            f"Invalid direction {direction!r}; expected one of 'N', 'E', 'S', 'W'."
+            f"Invalid direction {direction!r}; \
+                expected one of 'N', 'E', 'S', 'W'."
         )
         self.direction = direction
 
@@ -76,7 +85,9 @@ class InvalidPositionError(EntityError):
     """Raised when an entity is created with negative coordinates."""
 
     def __init__(self, pos: Tuple[int, int]) -> None:
-        super().__init__(f"Invalid entity position {pos}; coordinates must be >= 0.")
+        super().__init__(
+            f"Invalid entity position {pos}; coordinates must be >= 0."
+            )
         self.pos = pos
 
 
@@ -84,7 +95,9 @@ class InvalidHealthError(EntityError):
     """Raised when an entity is created with non-positive hit points."""
 
     def __init__(self, hp: int) -> None:
-        super().__init__(f"Invalid hit points {hp}; must be strictly positive.")
+        super().__init__(
+            f"Invalid hit points {hp}; must be strictly positive."
+        )
         self.hp = hp
 
 
@@ -92,7 +105,9 @@ class InvalidSpeedError(EntityError):
     """Raised when an entity is created with a non-positive speed."""
 
     def __init__(self, speed: int) -> None:
-        super().__init__(f"Invalid speed {speed}; must be strictly positive.")
+        super().__init__(
+            f"Invalid speed {speed}; must be strictly positive."
+        )
         self.speed = speed
 
 
@@ -100,7 +115,9 @@ class PathNotFoundError(EntityError):
     """Raised when no path exists between an entity and its target."""
 
     def __init__(self, start: Tuple[int, int], target: Tuple[int, int]) -> None:
-        super().__init__(f"No path from {start} to {target}.")
+        super().__init__(
+            f"No path from {start} to {target}."
+        )
         self.start = start
         self.target = target
 

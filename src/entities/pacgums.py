@@ -1,12 +1,14 @@
 from .pos import Pos
 from typing import List
 
+SPRITE = ["assets/pacgums/pacgum.png"]
+
 
 class Pacgum:
-    pacgums = []
+    pacgums = dict()
 
-    def __init__(self, pos_x: int, pos_y: int, color: List[int],
-                 size: int, super_pacgum: bool, score: int):
+    def __init__(self, pos_x: int, pos_y: int,
+                 super_pacgum: bool, score: int):
         """
         pos_x -> col of the pacgum
         pos_y -> line of the pacgum
@@ -15,11 +17,21 @@ class Pacgum:
         super_pacgum -> if true -> super else not
         """
         self.pos = Pos(pos_x, pos_y)
-        self.color = color
-        self.size = size
+        self.render_x = float(pos_x * 40)
+        self.render_y = float(pos_y * 40)
+        self.sprite = SPRITE[0]
         self.super_pacgum = super_pacgum
         self.score = score
-        Pacgum.pacgums.append(self)
+        Pacgum.pacgums.update({self.pos.get_pos(): self})
+
+    @classmethod
+    def check_eaten(cls, hunter):
+        pos = hunter.pos.get_pos()
+        pacgum = None
+        if pos in cls.pacgums:
+            pacgum = cls.pacgums.pop(pos)
+        if pacgum:
+            pacgum.is_eaten(hunter)
 
     def is_eaten(self, hunter) -> bool:
         if not hunter.player:
@@ -27,5 +39,5 @@ class Pacgum:
         else:
             hunter.score += self.score
             if self.super_pacgum:
-                hunter.swich_mode_all()
+                hunter.pac_man_hunting()
             return (True)
