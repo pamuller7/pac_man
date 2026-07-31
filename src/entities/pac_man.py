@@ -13,22 +13,38 @@ class PacMan(Entity):
         self.assets = [
             {
                 "N": ["assets/super_pac_man/up/up_1.png",
+                      "assets/super_pac_man/up/up_2.png",
+                      "assets/super_pac_man/up/up_3.png",
                       "assets/super_pac_man/up/up_2.png"],
                 "S": ["assets/super_pac_man/down/down_1.png",
+                      "assets/super_pac_man/down/down_2.png",
+                      "assets/super_pac_man/down/down_3.png",
                       "assets/super_pac_man/down/down_2.png"],
                 "W": ["assets/super_pac_man/left/left_1.png",
+                      "assets/super_pac_man/left/left_2.png",
+                      "assets/super_pac_man/left/left_3.png",
                       "assets/super_pac_man/left/left_2.png"],
                 "E": ["assets/super_pac_man/right/right_1.png",
+                      "assets/super_pac_man/right/right_2.png",
+                      "assets/super_pac_man/right/right_3.png",
                       "assets/super_pac_man/right/right_2.png"],
                 },
             {
                 "N": ["assets/pac_man/up/up_1.png",
+                      "assets/pac_man/up/up_2.png",
+                      "assets/pac_man/up/up_3.png",
                       "assets/pac_man/up/up_2.png"],
                 "S": ["assets/pac_man/down/down_1.png",
+                      "assets/pac_man/down/down_2.png",
+                      "assets/pac_man/down/down_3.png",
                       "assets/pac_man/down/down_2.png"],
                 "W": ["assets/pac_man/left/left_1.png",
+                      "assets/pac_man/left/left_2.png",
+                      "assets/pac_man/left/left_3.png",
                       "assets/pac_man/left/left_2.png"],
                 "E": ["assets/pac_man/right/right_1.png",
+                      "assets/pac_man/right/right_2.png",
+                      "assets/pac_man/right/right_3.png",
                       "assets/pac_man/right/right_2.png"],
                 }
             ]
@@ -36,7 +52,7 @@ class PacMan(Entity):
 
     def update_entity(self, frame_count):
         if frame_count == 0:
-            self.tick = (self.tick + 1) % 2
+            self.tick = (self.tick + 1) % 4
         self.sprite = self.current_asset[self.facing][self.tick]
         if self.god_mod:
             return

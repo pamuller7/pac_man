@@ -179,7 +179,7 @@ class Engine:
         running = True
         replay = False
         while running:
-            self.frame_count = (self.frame_count + 1) % 10
+            self.frame_count = (self.frame_count + 1) % 5
             dt = self.clock.tick(60) / 10
             running = self._handle_events()
             self._update(dt)
