@@ -19,6 +19,8 @@ class Ghost(Entity):
         self.mooves = [('N', 0, -1), ('W', -1, 0), ('S', 0, 1), ('E', 1, 0)]
         self.pac_man_pos = pac_man_pos
         self.normal_behaviour = True
+        self.eating = True
+        self.speed_init = speed
         self.speed = speed
         self.chase_limit = 10
         self.chill = self.chase_limit
@@ -36,7 +38,7 @@ class Ghost(Entity):
             (on va dire qu'il cible devant
             pac man si rouge derrier, derriere pac man sinon)
         """
-        if self.hp <= 0:
+        if not self.alive:
             self.go_spawn()
             return
         if self.normal_behaviour and not self.targetable:
@@ -44,20 +46,30 @@ class Ghost(Entity):
         elif not self.normal_behaviour and not self.targetable:
             self.random_dir()
         else:
-            self.run_away()
+            if self.dist_from_pac_man < 8:
+                self.run_away()
+            else:
+                self.random_dir()
 
     def update_entity(self, frame_count):
-        if self.hp <= 0 and self.pos.get_pos() == self.init_pos:
+        if (
+            not self.alive
+            and self.pos.get_pos() == self.init_pos
+            and time() - self.dead_since >= self.respawn_time
+        ):
             self.hp = 1
+            self.alive = True
             self.targetable = False
-        if self.hp <= 0:
-            print(self.hp)
+        if not self.alive:
             self.targetable = True
             self.sprite = self.assets["dead"]
+            self.speed = self.speed_init
         elif self.targetable:
             self.sprite = self.assets['swich'][self.tick]
+            self.speed = self.speed_init/2
         else:
             self.sprite = self.assets[self.facing][self.tick]
+            self.speed = self.speed_init
         if frame_count == 0:
             self.tick = (self.tick + 1) % 2
         if self.normal_behaviour and not self.targetable:
