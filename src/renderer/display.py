@@ -2,21 +2,32 @@ import pygame
 
 TAILLE_CASE = 40
 N, E, S, W = 1, 2, 4, 8
+JAUNE = (255, 255, 0)
+NOIR = (0, 0, 0)
+EPAISSEUR = 3
 
+def draw_rect_pixel(surface: pygame.Surface,
+                    start_x: int, start_y: int,
+                    largeur: int, hauteur: int,
+                    couleur_bord: tuple = JAUNE,
+                    couleur_fond: tuple = NOIR,
+                    epaisseur: int = EPAISSEUR) -> None:
+    """Draws one rectangle onto the surface, pixel by pixel."""
+    surface.lock()
+    for i in range(hauteur):
+        for j in range(largeur):
+            couleur = couleur_fond
+            if i < epaisseur:
+                couleur = couleur_bord
+            elif i >= hauteur - epaisseur:
+                couleur = couleur_bord
+            elif j < epaisseur:
+                couleur = couleur_bord
+            elif j >= largeur - epaisseur:
+                couleur = couleur_bord
+            surface.set_at((start_x + j, start_y + i), couleur)
+    surface.unlock()
 
-def loading_screen(screen: pygame.Surface, message: str = "Loading...",
-                    duration_ms: int = 2000) -> None:
-    """Displays a simple loading screen for a fixed duration."""
-    font = pygame.font.SysFont(None, 48)
-    text = font.render(message, True, (255, 255, 255))
-    text_rect = text.get_rect(center=(screen.get_width() // 2,
-                                        screen.get_height() // 2))
-
-    screen.fill((0, 0, 0))
-    screen.blit(text, text_rect)
-    pygame.display.flip()
-
-    pygame.time.delay(duration_ms)
 
 def draw_cell(surface: pygame.Surface, col: int, ligne: int,
               valeur: int) -> None:
@@ -44,13 +55,8 @@ def draw_maze(maze: list[list[int]]) -> pygame.Surface:
     width = len(maze[0]) * TAILLE_CASE
     surface = pygame.Surface((width, height))
 
-    loading_screen(surface, "Loading maze...", 2000)
     for i, row in enumerate(maze):
         for j, valeur in enumerate(row):
             draw_cell(surface, j, i, valeur)
     return surface
 
-
-
-def draw_menu():
-    pass

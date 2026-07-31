@@ -2,12 +2,14 @@ import os
 
 import pygame
 
-from ..entities import (PacMan, 
-                        Entity, 
-                        RedGhost, 
-                        BlueGhost, 
-                        OrangeGhost, 
-                        PurpuleGhost, 
+# from src.entities import entity
+
+from ..entities import (PacMan,
+                        Entity,
+                        RedGhost,
+                        BlueGhost,
+                        OrangeGhost,
+                        PurpuleGhost,
                         Pacgum)
 from ..error import (
     AssetError,
@@ -17,7 +19,7 @@ from ..error import (
     MalformedMazeError,
     NoSpawnError,
 )
-from ..renderer import TAILLE_CASE, draw_maze
+from ..renderer import TAILLE_CASE, draw_maze, display_endgame
 
 PAC_SPRITE = "assets/pacman.png"
 GHOST_BLUE_SPRITE = "assets/ghost_blue.png"
@@ -26,7 +28,6 @@ GHOST_PINK_SPRITE = "assets/ghost_pink.png"
 GHOST_RED_SPRITE = "assets/ghost_red.png"
 
 MOVE_INTERVAL = 150
-
 
 
 KEY_TO_DIR = {
@@ -109,6 +110,8 @@ class Engine:
             AssetError: if the Pac-Man sprite cannot be loaded.
         """
         validate_maze(maze)
+        Entity.reset_all()
+        Pacgum.reset_all()
         self.maze = maze
         pygame.init()
         pygame.display.set_caption("ᗧ Pac-Man ᗧ")
@@ -137,7 +140,7 @@ class Engine:
                         score = 200
                     Pacgum(x, y, check_super, score)
         maze_infos = (len(maze) - 1, len(maze[0]) - 1)
-        self.pacman = PacMan(spawn_col, spawn_row, 
+        self.pacman = PacMan(spawn_col, spawn_row,
                              maze_infos=maze_infos)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
@@ -170,16 +173,20 @@ class Engine:
         dim = (TAILLE_CASE//div, TAILLE_CASE//div)
         return pygame.transform.scale(image, dim)
 
-    def run(self) -> None:
-        """Main loop: read time, read keys, move Pac-Man, draw."""
+    def run(self) -> bool:
+        """Main loop. Returns True if the player wants to replay."""
         running = True
+        replay = False
         while running:
             self.frame_count = (self.frame_count + 1) % 10
             dt = self.clock.tick(60) / 10
             running = self._handle_events()
             self._update(dt)
             self._draw()
-        pygame.quit()
+            if self.pacman.isdead:
+                replay = display_endgame(self.screen, self.pacman.score)
+                running = False
+        return replay
 
     def _handle_events(self) -> bool:
         """Handles input; returns False when the window is closed."""
@@ -215,7 +222,10 @@ class Engine:
     def _step(self, entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
         print(entity.facing)
-        if entity.player and self.buffered_dir and entity.can_move(self.maze, self.buffered_dir):
+
+        if (entity.player
+                and self.buffered_dir
+                and entity.can_move(self.maze, self.buffered_dir)):
             entity.facing = self.buffered_dir
         elif not entity.player:
             entity.find_target_tile()

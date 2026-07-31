@@ -5,7 +5,6 @@ class PacManError(Exception):
     """Base class for every error raised by the game."""
 
 
-
 class MazeError(PacManError):
     """Base class for problems with the maze grid."""
 
@@ -13,7 +12,7 @@ class MazeError(PacManError):
 class EmptyMazeError(MazeError):
     """Raised when a maze has no rows or no columns."""
 
-    def __init__(self, 
+    def __init__(self,
                  message: str = "Maze is empty (no rows or columns)."
                  ) -> None:
         super().__init__(message)
@@ -49,7 +48,7 @@ class InvalidCellError(MazeError):
 class NoSpawnError(MazeError):
     """Raised when the maze has no walkable cell to spawn an entity on."""
 
-    def __init__(self, 
+    def __init__(self,
                  message: str = "No walkable cell found to spawn on."
                  ) -> None:
         super().__init__(message)
@@ -61,7 +60,7 @@ class OutOfBoundsError(MazeError):
     def __init__(self, pos: Tuple[int, int], size: Tuple[int, int]) -> None:
         super().__init__(
             f"Position {pos} is outside the maze of size {size}."
-            )
+        )
         self.pos = pos
         self.size = size
 
@@ -87,7 +86,7 @@ class InvalidPositionError(EntityError):
     def __init__(self, pos: Tuple[int, int]) -> None:
         super().__init__(
             f"Invalid entity position {pos}; coordinates must be >= 0."
-            )
+        )
         self.pos = pos
 
 
@@ -114,7 +113,9 @@ class InvalidSpeedError(EntityError):
 class PathNotFoundError(EntityError):
     """Raised when no path exists between an entity and its target."""
 
-    def __init__(self, start: Tuple[int, int], target: Tuple[int, int]) -> None:
+    def __init__(self,
+                 start: Tuple[int, int],
+                 target: Tuple[int, int]) -> None:
         super().__init__(
             f"No path from {start} to {target}."
         )

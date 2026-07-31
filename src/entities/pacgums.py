@@ -1,5 +1,4 @@
 from .pos import Pos
-from typing import List
 
 SPRITE = ["assets/pacgums/pacgum.png"]
 
@@ -23,6 +22,11 @@ class Pacgum:
         self.super_pacgum = super_pacgum
         self.score = score
         Pacgum.pacgums.update({self.pos.get_pos(): self})
+
+    @classmethod
+    def reset_all(cls) -> None:
+        """Clears the global pacgum registry (new game/level)."""
+        cls.pacgums.clear()
 
     @classmethod
     def check_eaten(cls, hunter):

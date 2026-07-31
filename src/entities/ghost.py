@@ -4,7 +4,7 @@ import random
 from time import time
 
 SCARED = [
-    "assets/scared_ghost/scared_1.png", 
+    "assets/scared_ghost/scared_1.png",
     "assets/scared_ghost/scared_2.png"]
 
 
@@ -31,9 +31,9 @@ class Ghost(Entity):
 
     def find_target_tile(self):
         """
-            Son ciblage dépend à la fois de la position de Rouge et 
+            Son ciblage dépend à la fois de la position de Rouge et
             de Pac-Man,
-            (on va dire qu'il cible devant 
+            (on va dire qu'il cible devant
             pac man si rouge derrier, derriere pac man sinon)
         """
         if self.hp <= 0:
@@ -129,13 +129,13 @@ class RedGhost(Ghost):
         self.assets = {
             "swich": SCARED,
             "dead": "assets/dead_ghost/dead.png",
-            "N": ["assets/ghost_red/up/up_1.png", 
+            "N": ["assets/ghost_red/up/up_1.png",
                   "assets/ghost_red/up/up_2.png"],
-            "S": ["assets/ghost_red/down/down_1.png", 
+            "S": ["assets/ghost_red/down/down_1.png",
                   "assets/ghost_red/down/down_2.png"],
-            "W": ["assets/ghost_red/left/left_1.png", 
+            "W": ["assets/ghost_red/left/left_1.png",
                   "assets/ghost_red/left/left_2.png"],
-            "E": ["assets/ghost_red/right/right_1.png", 
+            "E": ["assets/ghost_red/right/right_1.png",
                   "assets/ghost_red/right/right_2.png"],
         }
 
@@ -157,21 +157,21 @@ class BlueGhost(Ghost):
         self.assets = {
             "swich": SCARED,
             "dead": "assets/dead_ghost/dead.png",
-            "N": ["assets/ghost_blue/up/up_1.png", 
+            "N": ["assets/ghost_blue/up/up_1.png",
                   "assets/ghost_blue/up/up_2.png"],
-            "S": ["assets/ghost_blue/down/down_1.png", 
+            "S": ["assets/ghost_blue/down/down_1.png",
                   "assets/ghost_blue/down/down_2.png"],
-            "W": ["assets/ghost_blue/left/left_1.png", 
+            "W": ["assets/ghost_blue/left/left_1.png",
                   "assets/ghost_blue/left/left_2.png"],
-            "E": ["assets/ghost_blue/right/right_1.png", 
+            "E": ["assets/ghost_blue/right/right_1.png",
                   "assets/ghost_blue/right/right_2.png"],
         }
 
     def nomal_proc(self):
         """
-            Son ciblage dépend à la fois 
+            Son ciblage dépend à la fois
             de la position de Rouge et de Pac-Man,
-            (on va dire qu'il cible devant pac man 
+            (on va dire qu'il cible devant pac man
             si rouge derrier, derriere pac man sinon)
         """
         pac_x, pac_y = self.pac_man_pos.get_pos()
@@ -193,13 +193,13 @@ class OrangeGhost(Ghost):
         self.assets = {
             "swich": SCARED,
             "dead": "assets/dead_ghost/dead.png",
-            "N": ["assets/ghost_orange/up/up_1.png", 
+            "N": ["assets/ghost_orange/up/up_1.png",
                   "assets/ghost_orange/up/up_2.png"],
-            "S": ["assets/ghost_orange/down/down_1.png", 
+            "S": ["assets/ghost_orange/down/down_1.png",
                   "assets/ghost_orange/down/down_2.png"],
-            "W": ["assets/ghost_orange/left/left_1.png", 
+            "W": ["assets/ghost_orange/left/left_1.png",
                   "assets/ghost_orange/left/left_2.png"],
-            "E": ["assets/ghost_orange/right/right_1.png", 
+            "E": ["assets/ghost_orange/right/right_1.png",
                   "assets/ghost_orange/right/right_2.png"],
         }
 
@@ -225,13 +225,13 @@ class PurpuleGhost(Ghost):
         self.assets = {
             "swich": SCARED,
             "dead": "assets/dead_ghost/dead.png",
-            "N": ["assets/ghost_pink/up/up_1.png", 
+            "N": ["assets/ghost_pink/up/up_1.png",
                   "assets/ghost_pink/up/up_2.png"],
-            "S": ["assets/ghost_pink/down/down_1.png", 
+            "S": ["assets/ghost_pink/down/down_1.png",
                   "assets/ghost_pink/down/down_2.png"],
-            "W": ["assets/ghost_pink/left/left_1.png", 
+            "W": ["assets/ghost_pink/left/left_1.png",
                   "assets/ghost_pink/left/left_2.png"],
-            "E": ["assets/ghost_pink/right/right_1.png", 
+            "E": ["assets/ghost_pink/right/right_1.png",
                   "assets/ghost_pink/right/right_2.png"],
         }
 

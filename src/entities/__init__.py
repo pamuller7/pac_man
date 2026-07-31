@@ -5,12 +5,12 @@ from .pacgums import Pacgum
 from .ghost import Ghost, RedGhost, BlueGhost, OrangeGhost, PurpuleGhost
 
 __all__ = [
-    "Entity", 
+    "Entity",
     "PacMan",
     "Pacgum",
     "Pos",
-    "Ghost", 
-    "RedGhost", 
-    "BlueGhost", 
-    "OrangeGhost", 
+    "Ghost",
+    "RedGhost",
+    "BlueGhost",
+    "OrangeGhost",
     "PurpuleGhost"]
