@@ -1,0 +1,14 @@
+# Pac-Man configuration file. <-test pour voir si les comment son bien ignorer
+{
+    "highscore_filename": "data/scores.json",
+     # Hello"lives":1,
+
+    "points_per_pacgum": 10,
+    "points_per_super_pacgum": 50,
+    "points_per_ghost": 200,
+    "levels": [
+        { "width": 20, "height": 10},
+        { "width": 40, "height": 10, "pacgum": 10000 },
+        { "width": 40, "height": 10, "pacgum": 10000 }
+    ]
+}

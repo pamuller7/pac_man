@@ -1,10 +1,12 @@
+from src.entities.pac_man import PacMan
+
 from .pos import Pos
 
 SPRITE = ["assets/pacgums/pacgum.png"]
 
 
 class Pacgum:
-    pacgums = dict()
+    pacgums: dict[tuple[int, int], 'Pacgum'] = dict()
 
     def __init__(self, pos_x: int, pos_y: int,
                  super_pacgum: bool, score: int):
@@ -29,7 +31,7 @@ class Pacgum:
         cls.pacgums.clear()
 
     @classmethod
-    def check_eaten(cls, hunter):
+    def check_eaten(cls, hunter: PacMan) -> None:
         pos = hunter.pos.get_pos()
         pacgum = None
         if pos in cls.pacgums:
@@ -37,7 +39,7 @@ class Pacgum:
         if pacgum:
             pacgum.is_eaten(hunter)
 
-    def is_eaten(self, hunter) -> bool:
+    def is_eaten(self, hunter: PacMan) -> bool:
         if not hunter.player:
             return (False)
         else:

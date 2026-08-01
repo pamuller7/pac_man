@@ -13,6 +13,7 @@ from ..entities import (PacMan,
                         OrangeGhost,
                         PurpuleGhost,
                         Pacgum)
+from ..config import Config, Level
 from ..error import (
     AssetError,
     AssetNotFoundError,
@@ -94,7 +95,8 @@ def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
     return best
 
 
-def find_corner(maze: list[list[int]]):
+def find_corner(maze: list[list[int]]) -> list[tuple[int, int]]:
+    """Returns the four corner cells of the maze, ghost spawn points."""
     rows, cols = len(maze), len(maze[0])
     return ([(0, 0), (0, rows - 1), (cols - 1, 0), (cols - 1, rows - 1)])
 
@@ -109,12 +111,16 @@ class Engine:
 
     def __init__(self, maze: list[list[int]],
                  screen: pygame.Surface | None = None,
-                 maze_surface: pygame.Surface | None = None) -> None:
+                 maze_surface: pygame.Surface | None = None,
+                 config: Config | None = None,
+                 level: Level | None = None) -> None:
         """Sets up the maze surface and Pac-Man.
 
         Creates the window only if no `screen` is given, and rebuilds the
         maze surface only if no `maze_surface` is given, so several games
-        in a row can share both instead of redoing them.
+        in a row can share both instead of redoing them. `config` and
+        `level` come from the configuration file; both fall back to their
+        defaults so the engine stays usable on its own.
 
         Raises:
             MazeError: if the maze is empty, not rectangular or has bad cells.
@@ -124,6 +130,8 @@ class Engine:
         validate_maze(maze)
         Entity.reset_all()
         Pacgum.reset_all()
+        self.config = config or Config()
+        self.level = level or self.config.levels[0]
         self.maze = maze
         pygame.init()
         pygame.display.set_caption("ᗧ Pac-Man ᗧ")
@@ -137,21 +145,11 @@ class Engine:
         self.maze_surface = maze_surface or draw_maze(maze)
         spawn_col, spawn_row = find_spawn(maze)
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
-        for y, line in enumerate(maze):
-            for x, cell in enumerate(line):
-                if cell != 15:
-                    check_super = False
-                    score = 100
-                    if (
-                        x in [0, len(maze[0]) - 1]
-                        and y in [0, len(maze) - 1]
-                    ):
-                        check_super = True
-                        score = 200
-                    Pacgum(x, y, check_super, score)
+        self.spawn_pacgums(maze, self.level.pacgum)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         self.pacman = PacMan(spawn_col, spawn_row,
-                             maze_infos=maze_infos)
+                             maze_infos=maze_infos,
+                             hp=self.config.lives)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
                        BlueGhost(blue_pos[0], blue_pos[1],
@@ -160,7 +158,35 @@ class Engine:
                                    self.pacman.pos, maze_infos=maze_infos),
                        PurpuleGhost(pink_pos[0], pink_pos[1],
                                     self.pacman.pos, maze_infos=maze_infos)]
+        for ghost in self.ghosts:
+            ghost.score = self.config.points_per_ghost
         self.buffered_dir: str | None = None
+        self.skip_level = False
+
+    def spawn_pacgums(self, maze: list[list[int]], count: int) -> None:
+        """Spreads at most `count` pacgums over the walkable cells.
+
+        The walkable corners always get a super pacgum; the remaining
+        cells are picked at a regular interval so the pacgums stay spread
+        over the whole maze instead of piling up on the first rows.
+        """
+        corners: list[tuple[int, int]] = []
+        others: list[tuple[int, int]] = []
+        for y, line in enumerate(maze):
+            for x, cell in enumerate(line):
+                if cell == 15:
+                    continue
+                is_corner = (x in (0, len(line) - 1)
+                             and y in (0, len(maze) - 1))
+                (corners if is_corner else others).append((x, y))
+        left = count - len(corners)
+        if left < len(others):
+            step = len(others) / max(left, 1)
+            others = [others[int(i * step)] for i in range(max(left, 0))]
+        for x, y in corners[:count]:
+            Pacgum(x, y, True, self.config.points_per_super_pacgum)
+        for x, y in others:
+            Pacgum(x, y, False, self.config.points_per_pacgum)
 
     @staticmethod
     def load_sprite(path: str, div: int = 1) -> pygame.Surface:
@@ -183,7 +209,8 @@ class Engine:
         """Main loop. Returns (won, score) once the game is over.
 
         The engine does not show the endgame screen nor decide what comes
-        next: the caller owns the menu flow.
+        next: the caller owns the menu flow. A level skipped from the
+        pause menu counts as won, so the caller moves on to the next one.
         """
         running = True
         won = False
@@ -191,6 +218,8 @@ class Engine:
             self.frame_count = (self.frame_count + 1) % 5
             dt = self.clock.tick(60) / 10
             running = self._handle_events()
+            if self.skip_level:
+                return True, self.pacman.score
             self._update(dt)
             self._draw()
             if not self.pacman.alive:
@@ -218,7 +247,8 @@ class Engine:
         """Freezes the game on the pause screen.
 
         The game keeps showing behind the PAUSE text. Returns False when
-        the window is closed or the player quits, True on resume.
+        the window is closed or the player quits, True on resume and on
+        skip, the skip being read by `run` right after.
         """
         pause_menu(self.screen)
         pygame.display.flip()
@@ -231,6 +261,8 @@ class Engine:
                         return False
                     if event.key == pygame.K_p:
                         return True
+                    if event.key == pygame.K_n:
+                        return self._skip_level()
             # self.clock.tick(60)
 
     def _update(self, dt: float) -> None:
@@ -252,7 +284,7 @@ class Engine:
             entity.render_x = slide(entity.render_x, target_x, step)
             entity.render_y = slide(entity.render_y, target_y, step)
 
-    def step(self, entity) -> None:
+    def step(self, entity: Entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
 
         if (entity.player
@@ -288,3 +320,13 @@ class Engine:
                   f"score: {self.pacman.score}, hp: {self.pacman.hp}",
                   36, (0, 0), JAUNE, centre=False)
         pygame.display.flip()
+
+    def _skip_level(self) -> bool:
+        """Leaves the pause menu and ends the level as won.
+
+        Always returns True: the main loop keeps running for one more
+        turn, just long enough for `run` to see the flag. The next level
+        rebuilds its own pacgums, so the ones left here are dropped.
+        """
+        self.skip_level = True
+        return True

@@ -10,7 +10,7 @@ install:
 
 
 run:
-	uv run pacman.py
+	uv run pac-man.py config.json
 
 
 debug:
@@ -19,12 +19,13 @@ debug:
 
 clean:
 	@echo "cleaning..."
-	@rm -rf src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data __pycache__
+	@rm -rf src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data .mypy_cache
 
 
 lint:
 	@echo "linting..."
 	flake8 src
+	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 
 lint-strict:

@@ -16,15 +16,21 @@ class Entity:
     entities: List["Entity"] = []
 
     def __init__(self, pos_x: int, pos_y: int, hp: int,
-                 targetable: bool, maze_infos: tuple, speed: int = 2,
-                 player: bool = False, size: int = 8, facing="N") -> None:
-        """Initializes a new entity and registers it globally."""
+                 targetable: bool, maze_infos: Tuple[int, int],
+                 speed: int = 2, player: bool = False, size: int = 8,
+                 facing: str = "N") -> None:
+        """Initializes a new entity and registers it globally.
+
+        `maze_infos` is the (max x, max y) cell of the maze.
+        """
         self.pos = Pos(pos_x, pos_y)
         self.init_pos = (pos_x, pos_y)
         self.hp = hp
         self.score = 200
         self.respawn_time = 5
-        self.dead_since = 0
+        self.dead_since = 0.0
+        self.chase_swich = time()
+        self.normal_behaviour = True
         self.maze_infos = maze_infos
         self.targetable = targetable
         self.tick = 0
@@ -35,7 +41,8 @@ class Entity:
         self.facing = facing
         self.alive = True
         self.speed = speed
-        self.shortest_path: str | bool = False
+        self.target_tile = (pos_x, pos_y)
+        self.shortest_path = ""
         self.sprite = ""
         self.render_x = float(pos_x * 40)
         self.render_y = float(pos_y * 40)
@@ -112,6 +119,19 @@ class Entity:
             bool = True
         return bool
 
+    def update_entity(self, frame_count: int) -> None:
+        """Refreshes the entity for this frame (sprite, timers, state).
+
+        Every kind of entity overrides it; the base entity does nothing.
+        """
+
+    def find_target_tile(self) -> None:
+        """Chooses the cell the entity walks toward.
+
+        Only the entities driven by the game (the ghosts) override it;
+        Pac-Man is driven by the player and keeps its spawn tile.
+        """
+
     def swich_mode(self) -> None:
         """Toggles this entity's targetable state."""
         self.targetable = not self.targetable
@@ -119,7 +139,11 @@ class Entity:
 
     def find_short_path(self, maze: List[List[int]],
                         target: Tuple[int, int]) -> None:
-        """Computes the shortest path (BFS) from this entity to target."""
+        """Computes the shortest path (BFS) from this entity to target.
+
+        The result is stored in `self.shortest_path`: the letters of the
+        directions to follow, or False when the target cannot be reached.
+        """
         moves = [(0, -1, 1, 'N'), (1, 0, 2, 'E'),
                  (0, 1, 4, 'S'), (-1, 0, 8, 'W')]
         start = self.get_pos()
@@ -140,7 +164,7 @@ class Entity:
                     prev[(nx, ny)] = ((x, y), letter)
                     queue.append((nx, ny))
         if goal not in prev:
-            self.shortest_path = False
+            self.shortest_path = ""
             return
         letters = []
         cur = goal
@@ -151,7 +175,8 @@ class Entity:
         self.shortest_path = ''.join(reversed(letters))
 
     @classmethod
-    def pac_man_hunting(cls):
+    def pac_man_hunting(cls) -> None:
+        """Makes Pac-Man the hunter: only the ghosts stay targetable."""
         for entity in cls.entities:
             if entity.player:
                 entity.targetable = False
@@ -179,7 +204,8 @@ class Entity:
         return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)
 
     @classmethod
-    def check_eaten(cls):
+    def check_eaten(cls) -> None:
+        """Resolves every collision between two entities on the same cell."""
         for entity1 in cls.entities:
             for entity2 in cls.entities:
                 if entity1 == entity2:

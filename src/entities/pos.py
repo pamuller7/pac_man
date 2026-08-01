@@ -7,24 +7,24 @@ class Pos:
         self.y = y
         self.facing = "N"
 
-    def up(self, moove: int = 1):
+    def up(self, moove: int = 1) -> None:
         self.y -= moove
         self.facing = "N"
 
-    def down(self, moove: int = 1):
+    def down(self, moove: int = 1) -> None:
         self.y += moove
         self.facing = "S"
 
-    def left(self, moove: int = 1):
+    def left(self, moove: int = 1) -> None:
         self.x -= moove
         self.facing = "W"
 
-    def right(self, moove: int = 1):
+    def right(self, moove: int = 1) -> None:
         self.x += moove
         self.facing = "E"
 
-    def get_pos(self):
+    def get_pos(self) -> tuple[int, int]:
         return (self.x, self.y)
 
-    def get_facing(self):
+    def get_facing(self) -> str:
         return (self.facing)

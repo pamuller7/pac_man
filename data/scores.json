@@ -1,0 +1,114 @@
+{
+  "players": [
+    {
+      "name": "tristan",
+      "created_at": "2026-08-01 20:41:40",
+      "games_played": 1,
+      "best_score": 600
+    },
+    {
+      "name": "djalil",
+      "created_at": "2026-08-01 20:42:12",
+      "games_played": 1,
+      "best_score": 650
+    },
+    {
+      "name": "rgfdt",
+      "created_at": "2026-08-01 20:48:58",
+      "games_played": 1,
+      "best_score": 10
+    },
+    {
+      "name": "wgdgsd",
+      "created_at": "2026-08-01 20:49:13",
+      "games_played": 1,
+      "best_score": 20
+    },
+    {
+      "name": "gdg",
+      "created_at": "2026-08-01 21:04:43",
+      "games_played": 1,
+      "best_score": 20
+    },
+    {
+      "name": "pn",
+      "created_at": "2026-08-01 21:04:51",
+      "games_played": 3,
+      "best_score": 90
+    },
+    {
+      "name": "d",
+      "created_at": "2026-08-01 21:05:37",
+      "games_played": 1,
+      "best_score": 10
+    },
+    {
+      "name": "dfsgvd",
+      "created_at": "2026-08-01 21:07:17",
+      "games_played": 1,
+      "best_score": 190
+    },
+    {
+      "name": "dgdfs",
+      "created_at": "2026-08-01 21:15:04",
+      "games_played": 1,
+      "best_score": 60
+    },
+    {
+      "name": "jdalil",
+      "created_at": "2026-08-01 22:02:05",
+      "games_played": 1,
+      "best_score": 220
+    }
+  ],
+  "scores": [
+    [
+      "tristan",
+      600
+    ],
+    [
+      "djalil",
+      650
+    ],
+    [
+      "rgfdt",
+      10
+    ],
+    [
+      "wgdgsd",
+      20
+    ],
+    [
+      "gdg",
+      20
+    ],
+    [
+      "pn",
+      0
+    ],
+    [
+      "d",
+      10
+    ],
+    [
+      "dfsgvd",
+      190
+    ],
+    [
+      "dgdfs",
+      60
+    ],
+    [
+      "pn",
+      90
+    ],
+    [
+      "pn",
+      90
+    ],
+    [
+      "jdalil",
+      220
+    ]
+  ]
+}

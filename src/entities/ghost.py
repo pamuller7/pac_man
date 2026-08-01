@@ -2,6 +2,7 @@ from .entity import Entity
 from .pos import Pos
 import random
 from time import time
+from typing import Any, Dict, Tuple
 
 SCARED = [
     "assets/scared_ghost/scared_1.png",
@@ -9,10 +10,15 @@ SCARED = [
 
 
 class Ghost(Entity):
-    ghosts = dict()
+    ghosts: Dict[str, "Ghost"] = {}
 
-    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos, maze_infos,
-                 hp: int = 1, targetable: bool = False, speed=1):
+    # Filled in by every colour: "dead" holds a single sprite path, the
+    # other keys hold the frames of an animation.
+    assets: Dict[str, Any]
+
+    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
+                 maze_infos: Tuple[int, int], hp: int = 1,
+                 targetable: bool = False, speed: int = 1) -> None:
         super().__init__(pos_x, pos_y, hp, targetable, maze_infos,
                          speed, player=False, size=8)
         self.target_tile = (0, 0)
@@ -27,11 +33,19 @@ class Ghost(Entity):
         self.chase_swich = time()
         self.dist_from_pac_man = 0.0
 
-    def switch_state(self):
+    def switch_state(self) -> None:
+        """Toggles between the chase behaviour and the idle one."""
         self.normal_behaviour = not self.normal_behaviour
         self.chase_swich = time()
 
-    def find_target_tile(self):
+    def nomal_proc(self) -> None:
+        """Picks the target tile of the ghost's own chase behaviour.
+
+        Every colour overrides it; the plain ghost simply chases Pac-Man.
+        """
+        self.tracking()
+
+    def find_target_tile(self) -> None:
         """
             Son ciblage dépend à la fois de la position de Rouge et
             de Pac-Man,
@@ -51,7 +65,7 @@ class Ghost(Entity):
             else:
                 self.random_dir()
 
-    def update_entity(self, frame_count):
+    def update_entity(self, frame_count: int) -> None:
         if (
             not self.alive
             and self.pos.get_pos() == self.init_pos
@@ -66,7 +80,7 @@ class Ghost(Entity):
             self.speed = self.speed_init
         elif self.targetable:
             self.sprite = self.assets['swich'][self.tick]
-            self.speed = self.speed_init/2
+            self.speed = int(self.speed_init/2)
         else:
             self.sprite = self.assets[self.facing][self.tick]
             self.speed = self.speed_init
@@ -84,7 +98,7 @@ class Ghost(Entity):
         self.dist_from_pac_man = self.get_dist(self.pos.get_pos(),
                                                self.pac_man_pos.get_pos())
 
-    def run_away(self):
+    def run_away(self) -> Tuple[int, int]:
         """Choisit comme cible le coin le plus loin de Pac-Man."""
         px, py = self.pac_man_pos.get_pos()
         max_x_maze, max_y_maze = self.maze_infos
@@ -100,15 +114,15 @@ class Ghost(Entity):
         )
         return self.target_tile
 
-    def go_spawn(self):
+    def go_spawn(self) -> Tuple[int, int]:
         self.target_tile = self.init_pos
         return (self.target_tile)
 
-    def tracking(self):
+    def tracking(self) -> Tuple[int, int]:
         self.target_tile = self.pac_man_pos.get_pos()
         return (self.target_tile)
 
-    def going_b4_pac_man(self, sign=1):
+    def going_b4_pac_man(self, sign: int = 1) -> Tuple[int, int]:
         x, y = self.pac_man_pos.get_pos()
         for facing, moove_x, moove_y in self.mooves:
             if self.pac_man_pos.get_facing() == facing:
@@ -125,13 +139,14 @@ class Ghost(Entity):
                 self.target_tile = choose_x, choose_y
         return (self.target_tile)
 
-    def random_dir(self):
+    def random_dir(self) -> Tuple[int, int]:
         self.target_tile = (random.randint(0, 19), random.randint(0, 19))
         return (self.target_tile)
 
 
 class RedGhost(Ghost):
-    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
+                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -151,7 +166,7 @@ class RedGhost(Ghost):
                   "assets/ghost_red/right/right_2.png"],
         }
 
-    def nomal_proc(self):
+    def nomal_proc(self) -> None:
         """
             Sa cible est toujours la case exacte où se trouve Pac-Man
         """
@@ -159,7 +174,8 @@ class RedGhost(Ghost):
 
 
 class BlueGhost(Ghost):
-    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
+                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -179,7 +195,7 @@ class BlueGhost(Ghost):
                   "assets/ghost_blue/right/right_2.png"],
         }
 
-    def nomal_proc(self):
+    def nomal_proc(self) -> None:
         """
             Son ciblage dépend à la fois
             de la position de Rouge et de Pac-Man,
@@ -195,7 +211,8 @@ class BlueGhost(Ghost):
 
 
 class OrangeGhost(Ghost):
-    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
+                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -215,7 +232,7 @@ class OrangeGhost(Ghost):
                   "assets/ghost_orange/right/right_2.png"],
         }
 
-    def nomal_proc(self):
+    def nomal_proc(self) -> None:
         """
             Si Pac-Man est loin, il cible le centre du labyrinthe.
             S'il s'approche trop de Pac-Man, il fuit vers son coin d'origine
@@ -227,7 +244,8 @@ class OrangeGhost(Ghost):
 
 
 class PurpuleGhost(Ghost):
-    def __init__(self, pos_x, pos_y, pac_man_pos, maze_infos, speed=2):
+    def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
+                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -247,7 +265,7 @@ class PurpuleGhost(Ghost):
                   "assets/ghost_pink/right/right_2.png"],
         }
 
-    def nomal_proc(self):
+    def nomal_proc(self) -> None:
         """
             Il cible 4 cases devant la direction que regarde Pac-Man
         """
