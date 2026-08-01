@@ -142,3 +142,27 @@ class AssetNotFoundError(AssetError):
 
     def __init__(self, path: str) -> None:
         super().__init__(path, reason="file not found")
+
+
+class ProfileError(PacManError):
+    """Base class for player profile / score board failures."""
+
+
+class InvalidNameError(ProfileError):
+    """Raised when a player name cannot be used as a profile name."""
+
+    def __init__(self, name: str, reason: str = "") -> None:
+        detail = f": {reason}" if reason else ""
+        super().__init__(f"Invalid player name {name!r}{detail}.")
+        self.name = name
+        self.reason = reason
+
+
+class ScoreboardCorruptedError(ProfileError):
+    """Raised when the score file exists but cannot be read back."""
+
+    def __init__(self, path: str, reason: str = "") -> None:
+        detail = f": {reason}" if reason else ""
+        super().__init__(f"Corrupted score board {path!r}{detail}.")
+        self.path = path
+        self.reason = reason

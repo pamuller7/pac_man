@@ -4,6 +4,7 @@ TAILLE_CASE = 40
 N, E, S, W = 1, 2, 4, 8
 JAUNE = (255, 255, 0)
 NOIR = (0, 0, 0)
+BLANC = (255, 255, 255)
 EPAISSEUR = 3
 HUD_HEIGHT = 50
 

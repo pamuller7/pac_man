@@ -19,7 +19,7 @@ debug:
 
 clean:
 	@echo "cleaning..."
-	@rm -rf src/__pycache__ src/*/__pycache__/ .venv
+	@rm -rf src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data __pycache__
 
 
 lint:

@@ -2,6 +2,8 @@ import os
 
 import pygame
 
+from src.renderer.display import JAUNE
+
 # from src.entities import entity
 
 from ..entities import (PacMan,
@@ -19,7 +21,11 @@ from ..error import (
     MalformedMazeError,
     NoSpawnError,
 )
-from ..renderer import TAILLE_CASE, HUD_HEIGHT, draw_maze, display_endgame
+from ..renderer import (TAILLE_CASE,
+                        HUD_HEIGHT,
+                        draw_maze,
+                        draw_text,
+                        pause_menu)
 
 PAC_SPRITE = "assets/pacman.png"
 GHOST_BLUE_SPRITE = "assets/ghost_blue.png"
@@ -174,10 +180,14 @@ class Engine:
         dim = (TAILLE_CASE//div, TAILLE_CASE//div)
         return pygame.transform.scale(image, dim)
 
-    def run(self) -> bool:
-        """Main loop. Returns True if the player wants to replay."""
+    def run(self) -> tuple[bool, int]:
+        """Main loop. Returns (won, score) once the game is over.
+
+        The engine does not show the endgame screen nor decide what comes
+        next: the caller owns the menu flow.
+        """
         running = True
-        replay = False
+        won = False
         while running:
             self.frame_count = (self.frame_count + 1) % 5
             dt = self.clock.tick(60) / 10
@@ -185,9 +195,11 @@ class Engine:
             self._update(dt)
             self._draw()
             if not self.pacman.alive:
-                replay = display_endgame(self.screen, self.pacman.score)
                 running = False
-        return replay
+            elif not Pacgum.pacgums:
+                won = True
+                running = False
+        return won, self.pacman.score
 
     def _handle_events(self) -> bool:
         """Handles input; returns False when the window is closed."""
@@ -197,9 +209,30 @@ class Engine:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
+                if event.key == pygame.K_p:
+                    return self._pause()
                 self.buffered_dir = KEY_TO_DIR.get(
                     event.key, self.buffered_dir)
         return True
+
+    def _pause(self) -> bool:
+        """Freezes the game on the pause screen.
+
+        The game keeps showing behind the PAUSE text. Returns False when
+        the window is closed or the player quits, True on resume.
+        """
+        pause_menu(self.screen)
+        pygame.display.flip()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return False
+                    if event.key == pygame.K_p:
+                        return True
+            # self.clock.tick(60)
 
     def _update(self, dt: float) -> None:
         """
@@ -249,9 +282,10 @@ class Engine:
                 div = 2
             sprite = self.load_sprite(gums.sprite, div)
             x = gums.render_x + (TAILLE_CASE - sprite.get_width()) // 2
-            y = gums.render_y  + HUD_HEIGHT + (TAILLE_CASE - sprite.get_height()) // 2
+            y = (gums.render_y + HUD_HEIGHT
+                 + (TAILLE_CASE - sprite.get_height()) // 2)
             self.screen.blit(sprite, (x, y))
-        font = pygame.font.Font(None, 36)
-        texte = font.render(f"score: {self.pacman.score}, hp: {self.pacman.hp}", True, (255, 255, 255))  # Blanc
-        self.screen.blit(texte, (0, 0))
+        draw_text(self.screen,
+                  f"score: {self.pacman.score}, hp: {self.pacman.hp}",
+                  36, (0, 0), JAUNE, centre=False)
         pygame.display.flip()

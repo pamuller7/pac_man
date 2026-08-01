@@ -2,16 +2,21 @@ import pygame
 from ..display import draw_text, NOIR, JAUNE
 
 
-def display_endgame(screen: pygame.Surface, score: int = 0) -> bool:
-    """Displays the endgame screen. Returns True if the player restarts."""
+def display_endgame(screen: pygame.Surface, score: int = 0,
+                    won: bool = False) -> bool:
+    """Displays the endgame screen. Returns False if the player quits.
+
+    True means "carry on with the flow" (score entry, then main menu).
+    """
     centre_x = screen.get_width() // 2
     centre_y = screen.get_height() // 2
 
     screen.fill(NOIR)
 
-    draw_text(screen, "GAME OVER", 60, (centre_x, centre_y - 45), JAUNE)
+    titre = "YOU WIN" if won else "GAME OVER"
+    draw_text(screen, titre, 60, (centre_x, centre_y - 45), JAUNE)
     draw_text(screen, f"SCORE : {score}", 30, (centre_x, centre_y), JAUNE)
-    draw_text(screen, "ESPACE : REJOUER   -   ECHAP : QUITTER", 30,
+    draw_text(screen, "ESPACE : CONTINUER   -   ECHAP : QUITTER", 30,
               (centre_x, centre_y + 50), JAUNE)
     pygame.display.flip()
 
@@ -21,7 +26,7 @@ def display_endgame(screen: pygame.Surface, score: int = 0) -> bool:
             if event.type == pygame.QUIT:
                 return False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key in (pygame.K_SPACE, pygame.K_RETURN):
                     return True
                 if event.key == pygame.K_ESCAPE:
                     return False
