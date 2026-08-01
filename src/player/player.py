@@ -28,10 +28,15 @@ class Player:
             InvalidNameError: if the name is empty or too long.
         """
         self.name = self.clean_name(name)
-        self.created_at = created_at or datetime.now().isoformat(
-            timespec="seconds")
+        self.created_at = created_at or self.format_created_at()
         self.games_played = games_played
         self.best_score = best_score
+
+    def format_created_at(self) -> str:
+        self.created_at = datetime.now().isoformat(
+            timespec="seconds")
+        return datetime.fromisoformat(self.created_at).strftime(
+            "%Y-%m-%d %H:%M:%S")
 
     @staticmethod
     def clean_name(name: str) -> str:

@@ -151,8 +151,7 @@ class Engine:
                     Pacgum(x, y, check_super, score)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         self.pacman = PacMan(spawn_col, spawn_row,
-                             maze_infos=maze_infos,
-                             hp=3)
+                             maze_infos=maze_infos)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
                        BlueGhost(blue_pos[0], blue_pos[1],
