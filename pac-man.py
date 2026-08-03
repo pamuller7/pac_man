@@ -11,8 +11,9 @@ import random
 import sys
 
 import pygame
+from src.entities import PacMan
+from src.error import NoSpawnError
 from mazegenerator import MazeGenerator
-
 from src.config import Config, Level, load_config
 from src.engine import Engine
 from src.error import PacManError
@@ -23,6 +24,27 @@ from src.renderer import (HUD_HEIGHT, TAILLE_CASE, ask_name, display_endgame,
 TOP_SHOWN = 5
 USAGE = "usage: python3 pac-man.py config.json"
 
+def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
+    """Returns (col, row) of the walkable cell nearest the maze center.
+
+    Cells with value 15 have walls on all four sides (solid blocks), so
+    Pac-Man must not spawn there or he would be unable to move.
+
+    Raises:
+        NoSpawnError: if every cell is a solid wall block.
+    """
+    rows, cols = len(maze), len(maze[0])
+    center_x, center_y = cols // 2, rows // 2
+    best, best_dist = None, None
+    for y in range(rows):
+        for x in range(cols):
+            if maze[y][x] != 15:
+                dist = (x - center_x) ** 2 + (y - center_y) ** 2
+                if best_dist is None or dist < best_dist:
+                    best, best_dist = (x, y), dist
+    if best is None:
+        raise NoSpawnError()
+    return best
 
 def new_maze(level: Level) -> list[list[int]]:
     """Generates a fresh maze of the size asked by `level`."""
@@ -54,12 +76,22 @@ def play_run(screen: pygame.Surface,
     it is rebuilt whenever a level has a different size.
     """
     total = 0
+    pacman = PacMan(0, 0,
+                    maze_infos=(0, 0),
+                    hp=config.lives)
     for level in config.levels:
         maze = new_maze(level)
+        spawn_col, spawn_row = find_spawn(maze)
+        maze_infos = (len(maze[0]) - 1, len(maze) - 1)
+        pacman.set_init_pos(spawn_col, spawn_row, maze_infos)
         screen = open_window(level, screen)
-        won, score = Engine(maze, screen, draw_maze(maze),
-                            config, level).run()
-        total += score
+        won, score = Engine(maze=maze,
+                            player=pacman,
+                            screen=screen,
+                            maze_surface=draw_maze(maze),
+                            config=config,
+                            level=level).run()
+        total = pacman.score
         if not won:
             return False, total, screen
     return True, total, screen

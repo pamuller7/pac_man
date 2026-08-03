@@ -59,6 +59,30 @@
       "created_at": "2026-08-01 22:02:05",
       "games_played": 1,
       "best_score": 220
+    },
+    {
+      "name": "Pamuller",
+      "created_at": "2026-08-03 08:59:56",
+      "games_played": 1,
+      "best_score": 3410
+    },
+    {
+      "name": "test3",
+      "created_at": "2026-08-03 09:01:23",
+      "games_played": 1,
+      "best_score": 140
+    },
+    {
+      "name": "cheat",
+      "created_at": "2026-08-03 09:58:39",
+      "games_played": 1,
+      "best_score": 32280
+    },
+    {
+      "name": "test",
+      "created_at": "2026-08-03 16:52:44",
+      "games_played": 2,
+      "best_score": 100
     }
   ],
   "scores": [
@@ -109,6 +133,26 @@
     [
       "jdalil",
       220
+    ],
+    [
+      "Pamuller",
+      3410
+    ],
+    [
+      "test3",
+      140
+    ],
+    [
+      "cheat",
+      32280
+    ],
+    [
+      "test",
+      100
+    ],
+    [
+      "test",
+      40
     ]
   ]
 }

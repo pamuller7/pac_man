@@ -109,7 +109,7 @@ class Engine:
     caller so they survive from one game to the next.
     """
 
-    def __init__(self, maze: list[list[int]],
+    def __init__(self, maze: list[list[int]], player: PacMan,
                  screen: pygame.Surface | None = None,
                  maze_surface: pygame.Surface | None = None,
                  config: Config | None = None,
@@ -133,6 +133,11 @@ class Engine:
         self.config = config or Config()
         self.level = level or self.config.levels[0]
         self.maze = maze
+
+        red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
+        maze_infos = (len(maze[0]) - 1, len(maze) - 1)
+        self.pacman = player
+
         pygame.init()
         pygame.display.set_caption("ᗧ Pac-Man ᗧ")
         if screen is None:
@@ -143,13 +148,8 @@ class Engine:
         self.frame_count = 0
         self.clock = pygame.time.Clock()
         self.maze_surface = maze_surface or draw_maze(maze)
-        spawn_col, spawn_row = find_spawn(maze)
-        red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         self.spawn_pacgums(maze, self.level.pacgum)
-        maze_infos = (len(maze[0]) - 1, len(maze) - 1)
-        self.pacman = PacMan(spawn_col, spawn_row,
-                             maze_infos=maze_infos,
-                             hp=self.config.lives)
+
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
                        BlueGhost(blue_pos[0], blue_pos[1],
@@ -158,6 +158,7 @@ class Engine:
                                    self.pacman.pos, maze_infos=maze_infos),
                        PurpuleGhost(pink_pos[0], pink_pos[1],
                                     self.pacman.pos, maze_infos=maze_infos)]
+        Entity.entities.append(self.pacman)
         for ghost in self.ghosts:
             ghost.score = self.config.points_per_ghost
         self.buffered_dir: str | None = None
@@ -250,7 +251,7 @@ class Engine:
         the window is closed or the player quits, True on resume and on
         skip, the skip being read by `run` right after.
         """
-        pause_menu(self.screen)
+        pause_menu(self.screen, self.pacman)
         pygame.display.flip()
         while True:
             for event in pygame.event.get():
@@ -263,6 +264,8 @@ class Engine:
                         return True
                     if event.key == pygame.K_n:
                         return self._skip_level()
+                    if event.key == pygame.K_g:
+                        self.pacman.god_mod = not self.pacman.god_mod
             # self.clock.tick(60)
 
     def _update(self, dt: float) -> None:

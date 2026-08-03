@@ -29,7 +29,7 @@ class Ghost(Entity):
         self.speed_init = speed
         self.speed = speed
         self.chase_limit = 10
-        self.chill = self.chase_limit
+        self.chill = self.chase_limit // 2
         self.chase_swich = time()
         self.dist_from_pac_man = 0.0
 
@@ -43,7 +43,7 @@ class Ghost(Entity):
 
         Every colour overrides it; the plain ghost simply chases Pac-Man.
         """
-        self.tracking()
+        pass
 
     def find_target_tile(self) -> None:
         """
@@ -58,7 +58,10 @@ class Ghost(Entity):
         if self.normal_behaviour and not self.targetable:
             self.nomal_proc()
         elif not self.normal_behaviour and not self.targetable:
-            self.random_dir()
+            if self.dist_from_pac_man > 10:
+                self.tracking()
+            else:
+                self.random_dir()
         else:
             if self.dist_from_pac_man < 8:
                 self.run_away()
@@ -153,6 +156,7 @@ class RedGhost(Ghost):
                          maze_infos=maze_infos,
                          speed=speed)
         Ghost.ghosts.update({"red": self})
+        self.chill = self.chase_limit
         self.assets = {
             "swich": SCARED,
             "dead": "assets/dead_ghost/dead.png",
@@ -237,8 +241,10 @@ class OrangeGhost(Ghost):
             Si Pac-Man est loin, il cible le centre du labyrinthe.
             S'il s'approche trop de Pac-Man, il fuit vers son coin d'origine
         """
+
         if self.dist_from_pac_man > 10:
-            self.target_tile = (10, 9)
+            x, y = self.maze_infos
+            self.target_tile = (x//2, y//2)
         elif self.dist_from_pac_man <= 2:
             self.tracking()
 

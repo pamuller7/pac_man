@@ -4,6 +4,7 @@ from typing import List, Tuple
 from collections import deque
 import math
 from time import time
+from ..renderer import TAILLE_CASE
 
 
 CODE_DIR = {"N": 1, "E": 2, "S": 4, "W": 8}
@@ -14,7 +15,6 @@ class Entity:
     """Base class for any movable game entity (Pac-Man, ghosts)."""
 
     entities: List["Entity"] = []
-
     def __init__(self, pos_x: int, pos_y: int, hp: int,
                  targetable: bool, maze_infos: Tuple[int, int],
                  speed: int = 2, player: bool = False, size: int = 8,
@@ -47,6 +47,14 @@ class Entity:
         self.render_x = float(pos_x * 40)
         self.render_y = float(pos_y * 40)
         self.entities.append(self)
+
+    def set_init_pos(self, pos_x: int, pos_y: int,
+                     maze_infos: tuple[int]):
+        self.pos = Pos(pos_x, pos_y)
+        self.init_pos = (pos_x, pos_y)
+        self.maze_infos = maze_infos
+        self.render_x = pos_x * TAILLE_CASE
+        self.render_y = pos_y * TAILLE_CASE
 
     def get_pos(self) -> Tuple[int, int]:
         """Returns the entity's current position as (x, y)."""
@@ -103,21 +111,31 @@ class Entity:
         return True
 
     def is_eaten(self, hunter: "Entity") -> bool:
-        """Checks if this entity is eaten by the hunter entity."""
-        bool = False
-        if (
-            self.alive and
-            self.targetable and not hunter.targetable
-            and (self.player and not hunter.player
-                 or hunter.player and not self.player)):
+        if self.player and self.god_mod:
+            return False
+        if not (self.alive and hunter.alive):
+            return False
+        if hunter.player and not self.player:
+            if hunter.eats_everything:
+                if not self.targetable:
+                    return False
+            else:
+                return False
+        elif self.player and not hunter.player:
+            if self.eats_everything:
+                if hunter.targetable:
+                    return False
+        else:
+            return False
+        if self.targetable:
             self.hp -= 1
             hunter.score += self.score
             self.targetable = False
             if self.hp <= 0:
                 self.alive = False
                 self.dead_since = time()
-            bool = True
-        return bool
+            return True
+        return (False)
 
     def update_entity(self, frame_count: int) -> None:
         """Refreshes the entity for this frame (sprite, timers, state).
@@ -135,6 +153,7 @@ class Entity:
     def swich_mode(self) -> None:
         """Toggles this entity's targetable state."""
         self.targetable = not self.targetable
+        self.eats_everything = False
         self.chase_swich = time()
 
     def find_short_path(self, maze: List[List[int]],
@@ -179,7 +198,7 @@ class Entity:
         """Makes Pac-Man the hunter: only the ghosts stay targetable."""
         for entity in cls.entities:
             if entity.player:
-                entity.targetable = False
+                entity.eats_everything = True
             else:
                 entity.targetable = True
             entity.chase_swich = time()
