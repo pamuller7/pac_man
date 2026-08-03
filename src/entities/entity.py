@@ -128,6 +128,9 @@ class Entity:
         else:
             return False
         if self.targetable:
+            if self.player:
+                x, y = self.init_pos
+                self.set_init_pos(x, y, self.maze_infos)
             self.hp -= 1
             hunter.score += self.score
             self.targetable = False

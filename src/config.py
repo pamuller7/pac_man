@@ -97,7 +97,7 @@ def load_config(path: str) -> Config:
             f"{path}: expected a JSON object at the top level, "
             f"found {type(data).__name__}.")
     try:
-        return Config.model_validate(data)
+        return Config.model_validate(data, extra="ignore")
     except ValidationError as exc:
         raise ConfigError(
             f"invalid configuration in {path}:\n{format_errors(exc)}"

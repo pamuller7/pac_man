@@ -253,9 +253,9 @@ class Engine:
         the window is closed or the player quits, True on resume and on
         skip, the skip being read by `run` right after.
         """
-        pause_menu(self.screen, self.pacman)
-        pygame.display.flip()
         while True:
+            pause_menu(self.screen, self.pacman, self.ghosts)
+            pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return False
@@ -268,6 +268,11 @@ class Engine:
                         return self._skip_level()
                     if event.key == pygame.K_g:
                         self.pacman.god_mod = not self.pacman.god_mod
+                    if event.key == pygame.K_f:
+                        for ghost in self.ghosts:
+                            ghost.freeze = not ghost.freeze
+                    if event.key == pygame.K_h:
+                        self.pacman.hp += 1
             # self.clock.tick(60)
 
     def _update(self, dt: float) -> None:

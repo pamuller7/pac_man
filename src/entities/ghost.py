@@ -28,6 +28,7 @@ class Ghost(Entity):
         self.eating = True
         self.speed_init = speed
         self.speed = speed
+        self.freeze = False
         self.chase_limit = 10
         self.chill = self.chase_limit // 2
         self.chase_swich = time()
@@ -68,6 +69,12 @@ class Ghost(Entity):
             else:
                 self.random_dir()
 
+    def set_speed(self, amount: int):
+        if not self.freeze:
+            self.speed = amount
+        else:
+            self.speed = 0
+
     def update_entity(self, frame_count: int) -> None:
         if (
             not self.alive
@@ -80,13 +87,13 @@ class Ghost(Entity):
         if not self.alive:
             self.targetable = True
             self.sprite = self.assets["dead"]
-            self.speed = self.speed_init
+            self.set_speed(self.speed_init)
         elif self.targetable:
             self.sprite = self.assets['swich'][self.tick]
-            self.speed = int(self.speed_init/2)
+            self.set_speed(int(self.speed_init/2))
         else:
             self.sprite = self.assets[self.facing][self.tick]
-            self.speed = self.speed_init
+            self.set_speed(self.speed_init)
         if frame_count == 0:
             self.tick = (self.tick + 1) % 2
         if self.normal_behaviour and not self.targetable:
