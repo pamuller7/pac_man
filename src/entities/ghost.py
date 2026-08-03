@@ -59,7 +59,7 @@ class Ghost(Entity):
         if self.normal_behaviour and not self.targetable:
             self.nomal_proc()
         elif not self.normal_behaviour and not self.targetable:
-            if self.dist_from_pac_man > 10:
+            if self.dist_from_pac_man > 8:
                 self.tracking()
             else:
                 self.random_dir()

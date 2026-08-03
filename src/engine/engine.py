@@ -3,6 +3,7 @@ import os
 import pygame
 import random
 from src.renderer.display import JAUNE
+from time import time
 
 # from src.entities import entity
 
@@ -130,6 +131,9 @@ class Engine:
         validate_maze(maze)
         Entity.reset_all()
         Pacgum.reset_all()
+        self.time_spent = time()
+        self.time_frozen = False
+        self.freeze_time_start = 0.0
         self.config = config or Config()
         self.level = level or self.config.levels[0]
         self.maze = maze
@@ -225,12 +229,20 @@ class Engine:
                 return True, self.pacman.score
             self._update(dt)
             self._draw()
-            if not self.pacman.alive:
+            if (
+                not self.pacman.alive
+                or self._get_current_time() >= self.config.level_max_time
+            ):
                 running = False
             elif not Pacgum.pacgums:
                 won = True
                 running = False
         return won, self.pacman.score
+
+    def _get_current_time(self) -> float:
+        if self.time_frozen:
+            return self.freeze_time_start - self.time_spent
+        return time() - self.time_spent
 
     def _handle_events(self) -> bool:
         """Handles input; returns False when the window is closed."""
@@ -253,8 +265,9 @@ class Engine:
         the window is closed or the player quits, True on resume and on
         skip, the skip being read by `run` right after.
         """
+        time_in_pause = time()
         while True:
-            pause_menu(self.screen, self.pacman, self.ghosts)
+            pause_menu(self.screen, self.pacman, self.ghosts, self.time_frozen)
             pygame.display.flip()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -263,6 +276,7 @@ class Engine:
                     if event.key == pygame.K_ESCAPE:
                         return False
                     if event.key == pygame.K_p:
+                        self.time_spent += time() - time_in_pause
                         return True
                     if event.key == pygame.K_n:
                         return self._skip_level()
@@ -273,7 +287,17 @@ class Engine:
                             ghost.freeze = not ghost.freeze
                     if event.key == pygame.K_h:
                         self.pacman.hp += 1
+                    if event.key == pygame.K_t:
+                        self._toggle_time_freeze()
             # self.clock.tick(60)
+    
+    def _toggle_time_freeze(self) -> None:
+        """Toggles the level timer freeze (key 't')."""
+        if self.time_frozen:
+            self.time_spent += time() - self.freeze_time_start
+        else:
+            self.freeze_time_start = time()
+        self.time_frozen = not self.time_frozen
 
     def _update(self, dt: float) -> None:
         """
@@ -327,7 +351,8 @@ class Engine:
                  + (TAILLE_CASE - sprite.get_height()) // 2)
             self.screen.blit(sprite, (x, y))
         draw_text(self.screen,
-                  f"score: {self.pacman.score}, hp: {self.pacman.hp}",
+                  f"score: {self.pacman.score}, hp: {self.pacman.hp},\
+   {self.config.level_max_time - int(self._get_current_time())}s",
                   36, (0, 0), JAUNE, centre=False)
         pygame.display.flip()
 
