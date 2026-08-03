@@ -199,6 +199,7 @@ class Entity:
         for entity in cls.entities:
             if entity.player:
                 entity.eats_everything = True
+                entity.targetable = True
             else:
                 entity.targetable = True
             entity.chase_swich = time()

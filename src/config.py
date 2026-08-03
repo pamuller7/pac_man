@@ -39,6 +39,7 @@ class Config(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     highscore_filename: str = "data/scores.json"
+    pacgum: int = Field(1, ge=1)
     lives: int = Field(3, gt=0)
     points_per_pacgum: int = Field(10, ge=0)
     points_per_super_pacgum: int = Field(50, ge=0)

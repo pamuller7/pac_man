@@ -1,7 +1,7 @@
 import os
 
 import pygame
-
+import random
 from src.renderer.display import JAUNE
 
 # from src.entities import entity
@@ -148,7 +148,7 @@ class Engine:
         self.frame_count = 0
         self.clock = pygame.time.Clock()
         self.maze_surface = maze_surface or draw_maze(maze)
-        self.spawn_pacgums(maze, self.level.pacgum)
+        self.spawn_pacgums(maze, self.config.pacgum)
 
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
@@ -181,6 +181,8 @@ class Engine:
                              and y in (0, len(maze) - 1))
                 (corners if is_corner else others).append((x, y))
         left = count - len(corners)
+        random.shuffle(corners)
+        random.shuffle(others)
         if left < len(others):
             step = len(others) / max(left, 1)
             others = [others[int(i * step)] for i in range(max(left, 0))]

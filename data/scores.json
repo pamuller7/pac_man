@@ -83,6 +83,12 @@
       "created_at": "2026-08-03 16:52:44",
       "games_played": 2,
       "best_score": 100
+    },
+    {
+      "name": "t",
+      "created_at": "2026-08-03 16:59:14",
+      "games_played": 1,
+      "best_score": 150
     }
   ],
   "scores": [
@@ -153,6 +159,10 @@
     [
       "test",
       40
+    ],
+    [
+      "t",
+      150
     ]
   ]
 }

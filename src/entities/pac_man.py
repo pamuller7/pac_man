@@ -39,6 +39,7 @@ PAC_MAN_ASSETS = {
           "assets/pac_man/right/right_2.png"],
 }
 
+
 class PacMan(Entity):
     def __init__(self, pos_x: int, pos_y: int,
                  maze_infos: tuple[int, int],

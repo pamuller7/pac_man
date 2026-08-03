@@ -9,7 +9,7 @@ Python traceback, and exits with EXIT_FAILURE.
 
 import random
 import sys
-
+from time import time
 import pygame
 from src.entities import PacMan
 from src.error import NoSpawnError
@@ -91,6 +91,9 @@ def play_run(screen: pygame.Surface,
                             maze_surface=draw_maze(maze),
                             config=config,
                             level=level).run()
+        pacman.targetable = True
+        pacman.eats_everything = False
+        pacman.chase_swich = time()
         total = pacman.score
         if not won:
             return False, total, screen
