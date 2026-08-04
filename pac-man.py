@@ -54,22 +54,22 @@ def new_maze(level: Level) -> list[list[int]]:
     return maze
 
 
-def open_window(level: Level,
+def open_window(level: Level, max_height, max_width,
                 screen: pygame.Surface | None = None) -> pygame.Surface:
     """Opens (or resizes) the window so `level` fits in it.
 
     A `screen` already at the right size is kept as is: two levels of the
     same size must go on without the window blinking between them.
     """
-    width = level.width * TAILLE_CASE
-    height = level.height * TAILLE_CASE + HUD_HEIGHT
+    width = max_width * TAILLE_CASE
+    height = max_height * TAILLE_CASE + HUD_HEIGHT
     if screen is not None and screen.get_size() == (width, height):
         return screen
     return pygame.display.set_mode((width, height))
 
 
 def play_run(screen: pygame.Surface,
-             config: Config) -> tuple[bool, int, pygame.Surface]:
+             config: Config, max_height, max_width) -> tuple[bool, int, pygame.Surface]:
     """Plays the levels in order until one is lost or all are cleared.
 
     Returns (won, total score, window), the window being returned because
@@ -84,7 +84,7 @@ def play_run(screen: pygame.Surface,
         spawn_col, spawn_row = find_spawn(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         pacman.set_init_pos(spawn_col, spawn_row, maze_infos)
-        screen = open_window(level, screen)
+        screen = open_window(level, max_height, max_width, screen)
         won, score = Engine(maze=maze,
                             player=pacman,
                             screen=screen,
@@ -104,16 +104,17 @@ def game_loop(config: Config) -> None:
     """Menu -> game -> name entry, until the player leaves."""
     board = Scoreboard(config.highscore_filename)
     board.load()
-    screen = open_window(config.levels[0])
+    max_width = max(var.width for var in config.levels)
+    max_height = max(var.height for var in config.levels)
+    screen = open_window(config.levels[0], max_height, max_width)
     while main_menu(screen, board.top(TOP_SHOWN)):
-        won, score, screen = play_run(screen, config)
+        won, score, screen = play_run(screen, config, max_height, max_width)
         if not display_endgame(screen, score, won):
             break
         name = ask_name(screen, score)
         if name:
             board.add_score(board.get_player(name), score)
             board.save()
-
 
 def main(argv: list[str]) -> int:
     """Checks the arguments, loads the config and runs the game."""

@@ -8,10 +8,10 @@
     "points_per_super_pacgum": 50,
     "points_per_ghost": 200,
     "test": "AHAHAHAH",
-    "level_max_time": 5,
+    "level_max_time": 30,
     "levels": [
-        { "width": 5, "height": 5},
-        { "width": 40, "height": 10, "pacgum": 10000 },
-        { "width": 40, "height": 10, "pacgum": 10000 }
+        { "width": 20, "height": 10},
+        { "width": 40, "height": 10},
+        { "width": 40, "height": 10}
     ]
 }

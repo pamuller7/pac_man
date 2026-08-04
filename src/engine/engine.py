@@ -152,6 +152,7 @@ class Engine:
         self.frame_count = 0
         self.clock = pygame.time.Clock()
         self.maze_surface = maze_surface or draw_maze(maze)
+        self.origin_x, self.origin_y = self._center_maze()
         self.spawn_pacgums(maze, self.config.pacgum)
 
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
@@ -333,21 +334,35 @@ class Engine:
         if entity.facing and entity.can_move(self.maze, entity.facing):
             entity.try_move(self.maze, entity.facing)
 
+    def _center_maze(self) -> tuple[int, int]:
+        """Returns the pixel where the top-left maze cell is drawn.
+
+        The window is opened once for the whole run, so a level smaller
+        than the window is centred in it instead of the window being
+        resized to it. A maze larger than the window is pinned under the
+        HUD rather than pushed off screen.
+        """
+        free_x = self.screen.get_width() - len(self.maze[0]) * TAILLE_CASE
+        free_y = (self.screen.get_height() - HUD_HEIGHT
+                  - len(self.maze) * TAILLE_CASE)
+        return max(free_x // 2, 0), HUD_HEIGHT + max(free_y // 2, 0)
+
     def _draw(self) -> None:
         self.screen.fill((0, 0, 0))
-        self.screen.blit(self.maze_surface, (0, HUD_HEIGHT))
+        self.screen.blit(self.maze_surface, (self.origin_x, self.origin_y))
         for entity in Entity.entities:
             self.screen.blit(self.load_sprite(entity.sprite),
-                             (round(entity.render_x),
-                              round(entity.render_y + HUD_HEIGHT)))
+                             (round(self.origin_x + entity.render_x),
+                              round(self.origin_y + entity.render_y)))
         for gums in Pacgum.pacgums.values():
             if not gums.super_pacgum:
                 div = 3
             else:
                 div = 2
             sprite = self.load_sprite(gums.sprite, div)
-            x = gums.render_x + (TAILLE_CASE - sprite.get_width()) // 2
-            y = (gums.render_y + HUD_HEIGHT
+            x = (self.origin_x + gums.render_x
+                 + (TAILLE_CASE - sprite.get_width()) // 2)
+            y = (self.origin_y + gums.render_y
                  + (TAILLE_CASE - sprite.get_height()) // 2)
             self.screen.blit(sprite, (x, y))
         draw_text(self.screen,

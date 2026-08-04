@@ -78,7 +78,7 @@ def draw_cell(surface: pygame.Surface, col: int, ligne: int,
 
 def draw_maze(maze: list[list[int]]) -> pygame.Surface:
     """Builds the full maze as one static Surface (drawn once)."""
-    height = len(maze) * TAILLE_CASE + HUD_HEIGHT
+    height = len(maze) * TAILLE_CASE
     width = len(maze[0]) * TAILLE_CASE
     surface = pygame.Surface((width, height))
 
