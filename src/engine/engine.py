@@ -230,10 +230,10 @@ class Engine:
                 return True, self.pacman.score
             self._update(dt)
             self._draw()
-            if (
-                not self.pacman.alive
-                or self._get_current_time() >= self.config.level_max_time
-            ):
+            if (not self.pacman.alive):
+                running = False
+            elif (self._get_current_time() >= self.config.level_max_time):
+                won = True
                 running = False
             elif not Pacgum.pacgums:
                 won = True
@@ -291,7 +291,7 @@ class Engine:
                     if event.key == pygame.K_t:
                         self._toggle_time_freeze()
             # self.clock.tick(60)
-    
+
     def _toggle_time_freeze(self) -> None:
         """Toggles the level timer freeze (key 't')."""
         if self.time_frozen:

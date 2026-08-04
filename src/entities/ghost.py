@@ -55,16 +55,17 @@ class Ghost(Entity):
         """
         if not self.alive:
             self.go_spawn()
-            return
-        if self.normal_behaviour and not self.targetable:
+        # else:
+        #     self.nomal_proc()
+        elif self.normal_behaviour and not self.targetable:
             self.nomal_proc()
         elif not self.normal_behaviour and not self.targetable:
-            if self.dist_from_pac_man > 8:
-                self.tracking()
+            if self.dist_from_pac_man < 3:
+                self.run_away()
             else:
                 self.random_dir()
         else:
-            if self.dist_from_pac_man < 8:
+            if self.dist_from_pac_man < 3:
                 self.run_away()
             else:
                 self.random_dir()
@@ -134,23 +135,25 @@ class Ghost(Entity):
 
     def going_b4_pac_man(self, sign: int = 1) -> Tuple[int, int]:
         x, y = self.pac_man_pos.get_pos()
+        col_max, line_max = self.maze_infos
         for facing, moove_x, moove_y in self.mooves:
             if self.pac_man_pos.get_facing() == facing:
                 new_pos_x = x + sign * moove_x * 4
                 new_pos_y = y + sign * moove_y * 4
                 if new_pos_x >= 0:
-                    choose_x = min(new_pos_x, 19)
+                    choose_x = min(new_pos_x, col_max)
                 else:
                     choose_x = max(new_pos_x, 0)
                 if new_pos_y >= 0:
-                    choose_y = min(new_pos_y, 19)
+                    choose_y = min(new_pos_y, line_max)
                 else:
                     choose_y = max(new_pos_y, 0)
                 self.target_tile = choose_x, choose_y
         return (self.target_tile)
 
     def random_dir(self) -> Tuple[int, int]:
-        self.target_tile = (random.randint(0, 19), random.randint(0, 19))
+        col_max, line_max = self.maze_infos
+        self.target_tile = (random.randint(0, col_max), random.randint(0, line_max))
         return (self.target_tile)
 
 
@@ -215,9 +218,11 @@ class BlueGhost(Ghost):
         """
         pac_x, pac_y = self.pac_man_pos.get_pos()
         red_x, red_y = self.ghosts['red'].pos.get_pos()
-        if (pac_x - red_x) < 0 or (pac_y - red_y) < 0:
+        ahead = (pac_x - red_x) < -1 or (pac_y - red_y) < -1
+        behind = (pac_x - red_x) > 1 or (pac_y - red_y) > 1
+        if ahead:
             self.going_b4_pac_man()
-        else:
+        elif behind:
             self.going_b4_pac_man(-1)
 
 

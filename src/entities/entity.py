@@ -50,7 +50,7 @@ class Entity:
 
     def set_init_pos(self, pos_x: int, pos_y: int,
                      maze_infos: tuple[int]):
-        self.pos = Pos(pos_x, pos_y)
+        self.pos.set(pos_x, pos_y)      # mute l'objet existant
         self.init_pos = (pos_x, pos_y)
         self.maze_infos = maze_infos
         self.render_x = pos_x * TAILLE_CASE

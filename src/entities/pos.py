@@ -6,6 +6,10 @@ class Pos:
         self.x = x
         self.y = y
         self.facing = "N"
+    
+    def set(self, pos_x, pos_y):
+        self.x = pos_x
+        self.y = pos_y
 
     def up(self, moove: int = 1) -> None:
         self.y -= moove
