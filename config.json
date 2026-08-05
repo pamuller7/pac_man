@@ -10,7 +10,7 @@
     "test": "AHAHAHAH",
     "level_max_time": 30,
     "levels": [
-        { "width": 20, "height": 10},
+        { "width": 20, "width": 20, "height": 10},
         { "width": 40, "height": 10},
         { "width": 40, "height": 10}
     ]

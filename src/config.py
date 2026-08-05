@@ -34,6 +34,18 @@ class ConfigError(PacManError):
     """Raised when the configuration file cannot be read or used."""
 
 
+class DuplicateConfigKeyError(ConfigError):
+    """Raised when a JSON object in the config repeats the same key."""
+
+    def __init__(self, path: str, key: str) -> None:
+        super().__init__(
+            f"{path}: duplicate key {key!r} in configuration "
+            "(e.g. two 'width' or two 'height' entries in the same level)."
+        )
+        self.path = path
+        self.key = key
+
+
 class Level(BaseModel):
     """One playable level of the game."""
 
@@ -180,8 +192,20 @@ def load_config(path: str) -> Config:
     except OSError as exc:
         raise ConfigError(
             f"cannot open {path!r}: {exc.strerror}.") from exc
+
+    def reject_duplicates(pairs: list[tuple[str, object]]) -> dict:
+        seen: set[str] = set()
+        result = {}
+        for key, value in pairs:
+            if key in seen:
+                raise DuplicateConfigKeyError(path, key)
+            seen.add(key)
+            result[key] = value
+        return result
+
     try:
-        data = json.loads(strip_comments(raw))
+        data = json.loads(
+            strip_comments(raw), object_pairs_hook=reject_duplicates)
     except json.JSONDecodeError as exc:
         raise ConfigError(
             f"{path}:{exc.lineno}: invalid JSON: {exc.msg}.") from exc
