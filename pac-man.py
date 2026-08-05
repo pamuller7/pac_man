@@ -132,7 +132,7 @@ def game_loop(config: Config) -> None:
         won, score, screen = play_run(screen, config, max_height, max_width)
         if not display_endgame(screen, score, won):
             break
-        name = ask_name(screen, score)
+        name = ask_name(screen, won, score)
         if name:
             board.add_score(board.get_player(name), score)
             board.save()

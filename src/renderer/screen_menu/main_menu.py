@@ -56,6 +56,7 @@ def instructions_menu(screen: pygame.Surface) -> None:
                 ):
                     return
 
+
 def main_menu(screen: pygame.Surface,
               scores: list[tuple[str, int]] | None = None) -> bool:
     """Displays the main menu. Returns False if the player quits.
@@ -78,10 +79,11 @@ def main_menu(screen: pygame.Surface,
         draw_text(screen, "I : INSTRUCTIONS", 30,
                   (centre_x, centre_y - 10), JAUNE)
         if scores:
-            draw_text(screen, "MEILLEURS SCORES", 30, (centre_x, centre_y), JAUNE)
+            draw_text(screen, "MEILLEURS SCORES", 30,
+                      (centre_x, centre_y + 60), JAUNE)
             for rank, (name, score) in enumerate(scores):
                 draw_text(screen, f"{rank + 1}. {name} - {score}", 25,
-                            (centre_x, centre_y + 35 + rank * 25), JAUNE)
+                          (centre_x, centre_y + 100 + rank * 25), JAUNE)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

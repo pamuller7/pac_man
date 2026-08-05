@@ -1,9 +1,14 @@
 import pygame
 from ..display import draw_text, NOIR, JAUNE
 from ...player import NAME_MAX_LENGTH
+from .main_menu import load_sprite
+from ...error import AssetNotFoundError, AssetError
 
 
-def ask_name(screen: pygame.Surface, score: int = 0) -> str | None:
+ASSETS = ["assets/win.png", "assets/loose.png"]
+
+
+def ask_name(screen: pygame.Surface, won: int, score: int = 0) -> str | None:
     """Asks the player for a name to store the score under.
 
     Returns the typed name, or None if the player cancels or closes the
@@ -33,6 +38,11 @@ def ask_name(screen: pygame.Surface, score: int = 0) -> str | None:
                         return name.strip()
 
             screen.fill(NOIR)
+            sprite = ASSETS[0] if won else ASSETS[1]
+            try:
+                screen.blit(load_sprite(sprite, screen), (0, 10))
+            except (AssetNotFoundError, AssetError):
+                pass
             draw_text(screen, f"SCORE : {score}", 30,
                       (centre_x, centre_y - 80), JAUNE)
             draw_text(screen, "ENTREZ VOTRE NOM", 40,
