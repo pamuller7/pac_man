@@ -26,7 +26,10 @@ def instructions_menu(screen: pygame.Surface) -> None:
     """Displays the game instructions until the user presses a key."""
     centre_x = screen.get_width() // 2
     screen.fill(NOIR)
-    screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
+    try:
+        screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
+    except (AssetNotFoundError, AssetError):
+        pass
     draw_text(screen, "INSTRUCTIONS", 50, (centre_x, 60), JAUNE)
     instructions = [
         "Arrow keys or [w,a,s,d] : Move Pac-Man",
@@ -65,7 +68,10 @@ def main_menu(screen: pygame.Surface,
     pygame.event.clear()
     while True:
         screen.fill(NOIR)
-        screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
+        try:
+            screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
+        except (AssetNotFoundError, AssetError):
+            pass
         draw_text(screen, "PAC-MAN", 60, (centre_x, centre_y - 120), JAUNE)
         draw_text(screen, "ESPACE : JOUER   -   ECHAP : QUITTER", 30,
                   (centre_x, centre_y - 60), JAUNE)
