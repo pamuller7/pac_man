@@ -254,7 +254,7 @@ class OrangeGhost(Ghost):
             S'il s'approche trop de Pac-Man, il fuit vers son coin d'origine
         """
 
-        if self.dist_from_pac_man > 10:
+        if self.dist_from_pac_man > 8:
             x, y = self.maze_infos
             self.target_tile = (x//2, y//2)
         elif self.dist_from_pac_man <= 2:

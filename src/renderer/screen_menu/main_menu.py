@@ -1,6 +1,57 @@
 import pygame
 from ..display import draw_text, JAUNE, NOIR
+import os
+from ...error import AssetNotFoundError, AssetError
 
+
+def load_sprite(path: str, screen: pygame.Surface) -> pygame.Surface:
+    """Loads and scales a sprite to one cell.
+
+    Raises:
+        AssetNotFoundError: if the file does not exist.
+        AssetError: if pygame fails to decode it.
+    """
+    if not os.path.exists(path):
+        raise AssetNotFoundError(path)
+    try:
+        image = pygame.image.load(path).convert_alpha()
+    except pygame.error as exc:
+        raise AssetError(path, str(exc)) from exc
+    image = pygame.image.load(path).convert_alpha()
+    dim = (screen.get_width(), screen.get_height())
+    return pygame.transform.scale(image, dim)
+
+
+def instructions_menu(screen: pygame.Surface) -> None:
+    """Displays the game instructions until the user presses a key."""
+    centre_x = screen.get_width() // 2
+    screen.fill(NOIR)
+    screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
+    draw_text(screen, "INSTRUCTIONS", 50, (centre_x, 60), JAUNE)
+    instructions = [
+        "Arrow keys or [w,a,s,d] : Move Pac-Man",
+        "Eat all pacgums to complete the level.",
+        "Super pacgums allow you to eat ghosts.",
+        "Avoid ghosts while they are not vulnerable.",
+        "",
+        "SPACE or ESC : Return to the main menu",
+    ]
+
+    y = 140
+    for line in instructions:
+        draw_text(screen, line, 28, (centre_x, y), JAUNE)
+        y += 40
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+            if event.type == pygame.KEYDOWN:
+                if event.key in (
+                    pygame.K_ESCAPE,
+                    pygame.K_SPACE,
+                ):
+                    return
 
 def main_menu(screen: pygame.Surface,
               scores: list[tuple[str, int]] | None = None) -> bool:
@@ -11,26 +62,28 @@ def main_menu(screen: pygame.Surface,
     """
     centre_x = screen.get_width() // 2
     centre_y = screen.get_height() // 2
-
-    screen.fill(NOIR)
-    draw_text(screen, "PAC-MAN", 60, (centre_x, centre_y - 120), JAUNE)
-    draw_text(screen, "ESPACE : JOUER   -   ECHAP : QUITTER", 30,
-              (centre_x, centre_y - 60), JAUNE)
-
-    if scores:
-        draw_text(screen, "MEILLEURS SCORES", 30, (centre_x, centre_y), JAUNE)
-        for rank, (name, score) in enumerate(scores):
-            draw_text(screen, f"{rank + 1}. {name} - {score}", 25,
-                      (centre_x, centre_y + 35 + rank * 25), JAUNE)
-    pygame.display.flip()
-
     pygame.event.clear()
     while True:
+        screen.fill(NOIR)
+        screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
+        draw_text(screen, "PAC-MAN", 60, (centre_x, centre_y - 120), JAUNE)
+        draw_text(screen, "ESPACE : JOUER   -   ECHAP : QUITTER", 30,
+                  (centre_x, centre_y - 60), JAUNE)
+        draw_text(screen, "I : INSTRUCTIONS", 30,
+                  (centre_x, centre_y - 10), JAUNE)
+        if scores:
+            draw_text(screen, "MEILLEURS SCORES", 30, (centre_x, centre_y), JAUNE)
+            for rank, (name, score) in enumerate(scores):
+                draw_text(screen, f"{rank + 1}. {name} - {score}", 25,
+                            (centre_x, centre_y + 35 + rank * 25), JAUNE)
+        pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
+                if event.key == pygame.K_i:
+                    instructions_menu(screen)
                 if event.key in (pygame.K_SPACE, pygame.K_RETURN):
                     return True

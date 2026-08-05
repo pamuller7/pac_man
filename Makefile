@@ -9,7 +9,7 @@ install:
 	uv pip install mazegenerator-2.1.0-py3-none-any.whl
 
 
-run:
+run: install
 	uv run pac-man.py config.json
 
 

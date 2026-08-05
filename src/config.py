@@ -101,6 +101,13 @@ class Config(BaseModel):
         if not isinstance(data, dict):
             return data
         data = data.copy()
+        highscore_filename = data.get("highscore_filename", "data/scores.json")
+        data["highscore_filename"] = highscore_filename if isinstance(highscore_filename, str) else "data/scores.json"
+        if highscore_filename != data["highscore_filename"]:
+            print(f"Warning for 'highscore_filename': \
+'{highscore_filename}' not a str. 'highscore_filename' \
+set to '{data["highscore_filename"]}'")
+
         lives = get_int(data, "lives", 3)
         data["lives"] = lives if lives > 0 else 3
         if data["lives"] != lives:
