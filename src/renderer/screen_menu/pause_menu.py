@@ -1,17 +1,12 @@
 import pygame
-from ..display import draw_text, JAUNE
+from ..display import draw_text
 from typing import Any
 
 RED = (255, 0, 0)
 
-import pygame
-from ..display import draw_text, JAUNE
 
-
-RED = (255, 0, 0)
-
-
-def pause_menu(screen: pygame.Surface, player: Any, ghosts: Any, time_frozen: bool) -> None:
+def pause_menu(screen: pygame.Surface, player: Any,
+               ghosts: Any, time_frozen: bool) -> None:
     """Draws the PAUSE text. The caller owns the pause loop."""
     overlay = pygame.Surface(screen.get_size())
     overlay.set_alpha(180)

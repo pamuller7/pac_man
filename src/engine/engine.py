@@ -137,6 +137,7 @@ class Engine:
         self.config = config or Config()
         self.level = level or self.config.levels[0]
         self.maze = maze
+        self.corners, self.others = self.find_corner_and_other_cells(maze)
 
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
@@ -169,13 +170,10 @@ class Engine:
         self.buffered_dir: str | None = None
         self.skip_level = False
 
-    def spawn_pacgums(self, maze: list[list[int]], count: int) -> None:
-        """Spreads at most `count` pacgums over the walkable cells.
-
-        The walkable corners always get a super pacgum; the remaining
-        cells are picked at a regular interval so the pacgums stay spread
-        over the whole maze instead of piling up on the first rows.
-        """
+    def find_corner_and_other_cells(self,
+                                    maze: list[list[int]]
+                                    ) -> tuple[list[tuple[int, int]],
+                                               list[tuple[int, int]]]:
         corners: list[tuple[int, int]] = []
         others: list[tuple[int, int]] = []
         for y, line in enumerate(maze):
@@ -185,13 +183,24 @@ class Engine:
                 is_corner = (x in (0, len(line) - 1)
                              and y in (0, len(maze) - 1))
                 (corners if is_corner else others).append((x, y))
-        left = count - len(corners)
-        random.shuffle(corners)
+        return (corners, others)
+
+    def spawn_pacgums(self, maze: list[list[int]], count: int) -> None:
+        """Spreads at most `count` pacgums over the walkable cells.
+
+        The walkable corners always get a super pacgum; the remaining
+        cells are picked at a regular interval so the pacgums stay spread
+        over the whole maze instead of piling up on the first rows.
+        """
+        left = count - len(self.corners)
+        if left < len(self.others):
+            step = len(self.others) / max(left, 1)
+            others = [self.others[int(i * step)] for i in range(max(left, 0))]
+        else:
+            others = self.others
+        random.shuffle(self.corners)
         random.shuffle(others)
-        if left < len(others):
-            step = len(others) / max(left, 1)
-            others = [others[int(i * step)] for i in range(max(left, 0))]
-        for x, y in corners[:count]:
+        for x, y in self.corners[:count]:
             Pacgum(x, y, True, self.config.points_per_super_pacgum)
         for x, y in others:
             Pacgum(x, y, False, self.config.points_per_pacgum)
@@ -327,7 +336,7 @@ class Engine:
                 and entity.can_move(self.maze, self.buffered_dir)):
             entity.facing = self.buffered_dir
         elif not entity.player:
-            entity.find_target_tile()
+            entity.find_target_tile(self.corners + self.others, self.maze)
             entity.find_short_path(self.maze, entity.target_tile)
             if entity.shortest_path:
                 entity.facing = entity.shortest_path[0]

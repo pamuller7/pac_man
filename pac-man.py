@@ -54,7 +54,7 @@ def new_maze(level: Level) -> list[list[int]]:
     return maze
 
 
-def open_window(level: Level, max_height, max_width,
+def open_window(level: Level, max_height: int, max_width: int,
                 screen: pygame.Surface | None = None) -> pygame.Surface:
     """Opens (or resizes) the window so `level` fits in it.
 
@@ -69,7 +69,8 @@ def open_window(level: Level, max_height, max_width,
 
 
 def play_run(screen: pygame.Surface,
-             config: Config, max_height, max_width) -> tuple[bool, int, pygame.Surface]:
+             config: Config, max_height: int,
+             max_width: int) -> tuple[bool, int, pygame.Surface]:
     """Plays the levels in order until one is lost or all are cleared.
 
     Returns (won, total score, window), the window being returned because

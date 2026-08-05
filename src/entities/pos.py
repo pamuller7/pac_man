@@ -1,13 +1,13 @@
 class Pos:
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int) -> None:
         """
         N, E, S, W, decrit la direction a laquaelle il fait face (pour ghost)
         """
         self.x = x
         self.y = y
         self.facing = "N"
-    
-    def set(self, pos_x, pos_y):
+
+    def set(self, pos_x: int, pos_y: int) -> None:
         self.x = pos_x
         self.y = pos_y
 

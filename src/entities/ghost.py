@@ -11,9 +11,6 @@ SCARED = [
 
 class Ghost(Entity):
     ghosts: Dict[str, "Ghost"] = {}
-
-    # Filled in by every colour: "dead" holds a single sprite path, the
-    # other keys hold the frames of an animation.
     assets: Dict[str, Any]
 
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
@@ -46,31 +43,28 @@ class Ghost(Entity):
         """
         pass
 
-    def find_target_tile(self) -> None:
+    def find_target_tile(self, avb_cells: list[tuple[int, int]],
+                         maze: list[list[int]]) -> None:
         """
-            Son ciblage dépend à la fois de la position de Rouge et
-            de Pac-Man,
-            (on va dire qu'il cible devant
-            pac man si rouge derrier, derriere pac man sinon)
+            calls the right function depending on the ghost's
+            and pacman's state
+
+            avb_cells: cells of the maze that are reachable
+            maze: list of the maze
         """
         if not self.alive:
             self.go_spawn()
-        # else:
-        #     self.nomal_proc()
         elif self.normal_behaviour and not self.targetable:
             self.nomal_proc()
         elif not self.normal_behaviour and not self.targetable:
             if self.dist_from_pac_man < 3:
-                self.run_away()
+                self.run_away(maze)
             else:
-                self.random_dir()
+                self.random_dir(avb_cells)
         else:
-            if self.dist_from_pac_man < 3:
-                self.run_away()
-            else:
-                self.random_dir()
+            self.run_away(maze)
 
-    def set_speed(self, amount: int):
+    def set_speed(self, amount: int) -> None:
         if not self.freeze:
             self.speed = amount
         else:
@@ -109,8 +103,10 @@ class Ghost(Entity):
         self.dist_from_pac_man = self.get_dist(self.pos.get_pos(),
                                                self.pac_man_pos.get_pos())
 
-    def run_away(self) -> Tuple[int, int]:
-        """Choisit comme cible le coin le plus loin de Pac-Man."""
+    def run_away(self, maze: list[list[int]]) -> Tuple[int, int]:
+        """
+        sets the target_tile to the farthest away corner
+        """
         px, py = self.pac_man_pos.get_pos()
         max_x_maze, max_y_maze = self.maze_infos
         corners = [
@@ -134,6 +130,11 @@ class Ghost(Entity):
         return (self.target_tile)
 
     def going_b4_pac_man(self, sign: int = 1) -> Tuple[int, int]:
+        """
+            sets the target tile to the 4th tile before or after pacman
+            signe: int (1 or -1) -> 1 if we want to go defore pac man
+                                 -> -1 if we want to go behind pac man
+        """
         x, y = self.pac_man_pos.get_pos()
         col_max, line_max = self.maze_infos
         for facing, moove_x, moove_y in self.mooves:
@@ -151,9 +152,8 @@ class Ghost(Entity):
                 self.target_tile = choose_x, choose_y
         return (self.target_tile)
 
-    def random_dir(self) -> Tuple[int, int]:
-        col_max, line_max = self.maze_infos
-        self.target_tile = (random.randint(0, col_max), random.randint(0, line_max))
+    def random_dir(self, avb_cells: list[tuple[int, int]]) -> Tuple[int, int]:
+        self.target_tile = random.choice(avb_cells)
         return (self.target_tile)
 
 

@@ -15,6 +15,7 @@ class Entity:
     """Base class for any movable game entity (Pac-Man, ghosts)."""
 
     entities: List["Entity"] = []
+
     def __init__(self, pos_x: int, pos_y: int, hp: int,
                  targetable: bool, maze_infos: Tuple[int, int],
                  speed: int = 2, player: bool = False, size: int = 8,
@@ -26,6 +27,7 @@ class Entity:
         self.pos = Pos(pos_x, pos_y)
         self.init_pos = (pos_x, pos_y)
         self.hp = hp
+        self.god_mod = False
         self.score = 200
         self.respawn_time = 5
         self.dead_since = 0.0
@@ -49,7 +51,7 @@ class Entity:
         self.entities.append(self)
 
     def set_init_pos(self, pos_x: int, pos_y: int,
-                     maze_infos: tuple[int]):
+                     maze_infos: tuple[int, int]) -> None:
         self.pos.set(pos_x, pos_y)      # mute l'objet existant
         self.init_pos = (pos_x, pos_y)
         self.maze_infos = maze_infos
@@ -145,13 +147,16 @@ class Entity:
 
         Every kind of entity overrides it; the base entity does nothing.
         """
+        pass
 
-    def find_target_tile(self) -> None:
+    def find_target_tile(self, avb_cells: list[tuple[int, int]],
+                         maze: list[list[int]]) -> None:
         """Chooses the cell the entity walks toward.
 
         Only the entities driven by the game (the ghosts) override it;
         Pac-Man is driven by the player and keeps its spawn tile.
         """
+        pass
 
     def swich_mode(self) -> None:
         """Toggles this entity's targetable state."""
