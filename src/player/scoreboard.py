@@ -22,7 +22,6 @@ class Scoreboard:
     def __init__(self, path: str = DEFAULT_PATH) -> None:
         self.path = path
         self.players: Dict[str, Player] = {}
-        self.scores: List[Tuple[str, int]] = []
 
     def load(self) -> None:
         """Reads the file. Does nothing if it does not exist yet.
@@ -40,8 +39,6 @@ class Scoreboard:
                 entry["name"]: Player.from_dict(entry)
                 for entry in data["players"]
             }
-            self.scores = [(name, int(score))
-                           for name, score in data["scores"]]
         except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
             raise ScoreboardCorruptedError(self.path, str(exc)) from exc
 
@@ -56,7 +53,6 @@ class Scoreboard:
             os.makedirs(folder, exist_ok=True)
         data = {
             "players": [player.to_dict() for player in self.players.values()],
-            "scores": [List(entry) for entry in self.scores],
         }
         tmp_path = f"{self.path}.tmp"
         with open(tmp_path, "w", encoding="utf-8") as file:
@@ -77,13 +73,13 @@ class Scoreboard:
     def add_score(self, player: Player, score: int) -> bool:
         """Records one game result. True if it is a personal record."""
         self.players.setdefault(player.name, player)
-        self.scores.append((player.name, score))
         return player.record(score)
 
     def top(self, limit: int = 10) -> List[Tuple[str, int]]:
-        """Returns the `limit` best scores, highest first."""
-        return sorted(self.scores, key=lambda entry: entry[1],
-                      reverse=True)[:limit]
+        """Returns the `limit` players with the best score, highest first."""
+        ranked = sorted(self.players.values(),
+                        key=lambda player: player.best_score, reverse=True)
+        return [(player.name, player.best_score) for player in ranked[:limit]]
 
     def best_of(self, name: str) -> int:
         """Returns the best score of `name`, or 0 if unknown."""
