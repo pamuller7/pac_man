@@ -6,7 +6,7 @@ its JSON file.
 
 import json
 import os
-from typing import List, Tuple, Dict
+
 from ..error import ScoreboardCorruptedError
 from .player import Player
 
@@ -21,8 +21,8 @@ class Scoreboard:
 
     def __init__(self, path: str = DEFAULT_PATH) -> None:
         self.path = path
-        self.players: Dict[str, Player] = {}
-        self.scores: List[Tuple[str, int]] = []
+        self.players: dict[str, Player] = {}
+        self.scores: list[tuple[str, int]] = []
 
     def load(self) -> None:
         """Reads the file. Does nothing if it does not exist yet.
@@ -56,7 +56,7 @@ class Scoreboard:
             os.makedirs(folder, exist_ok=True)
         data = {
             "players": [player.to_dict() for player in self.players.values()],
-            "scores": [List(entry) for entry in self.scores],
+            "scores": [list(entry) for entry in self.scores],
         }
         tmp_path = f"{self.path}.tmp"
         with open(tmp_path, "w", encoding="utf-8") as file:
@@ -80,7 +80,7 @@ class Scoreboard:
         self.scores.append((player.name, score))
         return player.record(score)
 
-    def top(self, limit: int = 10) -> List[Tuple[str, int]]:
+    def top(self, limit: int = 10) -> list[tuple[str, int]]:
         """Returns the `limit` best scores, highest first."""
         return sorted(self.scores, key=lambda entry: entry[1],
                       reverse=True)[:limit]

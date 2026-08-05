@@ -53,7 +53,7 @@ def new_maze(level: Level) -> List[List[int]]:
     """Generates a fresh maze of the size asked by `level`."""
     maze: List[List[int]] = MazeGenerator(
         size=(level.width, level.height),
-        seed=random.randint(0, 1000)).maze
+        seed=level.seed).maze
     return maze
 
 
@@ -84,7 +84,14 @@ def play_run(screen: pygame.Surface,
                     maze_infos=(0, 0),
                     hp=config.lives)
     level_number = 0
-    for level in config.levels:
+    max_width = max(var.width for var in config.levels)
+    max_height = max(var.height for var in config.levels)
+    old_nb_pacgum = config.pacgum
+    while level_number < config.max_nb_level:
+        config.pacgum = old_nb_pacgum
+        level = config.levels[level_number]
+        if config.pacgum < 1:
+            config.pacgum = int(80 * level.width * level.height / 100)
         level_number += 1
         maze = new_maze(level)
         spawn_col, spawn_row = find_spawn(maze)
@@ -104,6 +111,13 @@ def play_run(screen: pygame.Surface,
         total = pacman.score
         if not won:
             return False, total, screen
+        if level_number == len(config.levels):
+            new_level = Level(
+                width=random.randint(20, max_width),
+                height=random.randint(20, max_height),
+                seed=random.randint(0, 100000),
+            )
+            config.levels.append(new_level)
     return True, total, screen
 
 

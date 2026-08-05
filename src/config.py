@@ -12,11 +12,21 @@ program must be able to fail cleanly) before any window is opened.
 import json
 import re
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from typing import Self, Any
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from .error import PacManError
 
 COMMENT_RE = re.compile(r"#|//|;")
+
+
+def get_int(data: dict[str, Any], key: str, default: int) -> int:
+    value = data.get(key, default)
+
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 class ConfigError(PacManError):
@@ -28,27 +38,75 @@ class Level(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    width: int = Field(20, gt=1, description="maze width, in cells")
-    height: int = Field(10, gt=1, description="maze height, in cells")
-    pacgum: int = Field(10000, gt=0, description="pacgums to eat to win")
+    width: int = 20
+    height: int = 20
+    seed: int = 42
+
+    @model_validator(mode="before")
+    @classmethod
+    def fallback(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        data = data.copy()
+
+        width = get_int(data, "width", 20)
+        data["width"] = max(20, min(width, 60))
+
+        height = get_int(data, "height", 20)
+        data["height"] = max(20, min(height, 30))
+
+        seed = get_int(data, "seed", 42)
+        data["seed"] = seed if seed >= 0 else 42
+        return data
 
 
 class Config(BaseModel):
     """Whole content of the configuration file."""
-
     model_config = ConfigDict(extra="forbid")
 
     highscore_filename: str = "data/scores.json"
-    level_max_time: int = Field(90, ge=1)
-    pacgum: int = Field(1, ge=1)
-    lives: int = Field(3, gt=0)
-    points_per_pacgum: int = Field(10, ge=0)
-    points_per_super_pacgum: int = Field(50, ge=0)
-    points_per_ghost: int = Field(200, ge=0)
-    levels: list[Level] = Field(
-        default_factory=lambda: [Level()],
-        min_length=1,
-    )
+    lives: int = 3
+    level_max_time: int = 90
+    pacgum: int = -1
+    points_per_pacgum: int = 10
+    points_per_super_pacgum: int = 50
+    points_per_ghost: int = 200
+    max_nb_level: int = 10
+    levels: list[Level] = Field(default_factory=lambda: [Level()])
+
+    @model_validator(mode="before")
+    @classmethod
+    def fallback(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        data = data.copy()
+        lives = get_int(data, "lives", 3)
+        data["lives"] = lives if lives > 0 else 3
+
+        level_max_time = get_int(data, "level_max_time", 90)
+        data["level_max_time"] = level_max_time if level_max_time >= 1 else 90
+
+        pacgum = get_int(data, "pacgum", -1)
+        data["pacgum"] = pacgum if pacgum >= 1 else -1
+
+        points_per_pacgum = get_int(data, "points_per_pacgum", 10)
+        data["points_per_pacgum"] = (points_per_pacgum
+                                     if points_per_pacgum >= 0 else 10)
+
+        points_per_super_pacgum = get_int(data, "points_per_super_pacgum", 50)
+        data["points_per_super_pacgum"] = (
+            points_per_super_pacgum if points_per_super_pacgum >= 0 else 50
+        )
+
+        points_per_ghost = get_int(data, "points_per_ghost", 200)
+        data["points_per_ghost"] = (points_per_ghost
+                                    if points_per_ghost >= 0 else 200)
+
+        max_nb_level = get_int(data, "max_nb_level", 10)
+        data["max_nb_level"] = max_nb_level if max_nb_level >= 1 else 10
+        if not data.get("levels"):
+            data["levels"] = [Level(width=10, height=10)]
+        return data
 
 
 def strip_comments(text: str) -> str:
