@@ -81,8 +81,8 @@
     {
       "name": "test",
       "created_at": "2026-08-03 16:52:44",
-      "games_played": 2,
-      "best_score": 100
+      "games_played": 3,
+      "best_score": 3090
     },
     {
       "name": "t",
@@ -105,6 +105,12 @@
     {
       "name": "rfgrdhtreh",
       "created_at": "2026-08-04 09:45:52",
+      "games_played": 1,
+      "best_score": 20
+    },
+    {
+      "name": "trest",
+      "created_at": "2026-08-05 17:08:24",
       "games_played": 1,
       "best_score": 20
     }
@@ -193,6 +199,14 @@
     [
       "rfgrdhtreh",
       20
+    ],
+    [
+      "trest",
+      20
+    ],
+    [
+      "test",
+      3090
     ]
   ]
 }

@@ -113,8 +113,8 @@ def play_run(screen: pygame.Surface,
             return False, total, screen
         if level_number == len(config.levels):
             new_level = Level(
-                width=random.randint(20, max_width),
-                height=random.randint(20, max_height),
+                width=random.randint(15, max_width),
+                height=random.randint(15, max_height),
                 seed=random.randint(0, 100000),
             )
             config.levels.append(new_level)
