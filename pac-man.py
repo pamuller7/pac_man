@@ -10,6 +10,7 @@ Python traceback, and exits with EXIT_FAILURE.
 import random
 import sys
 from time import time
+from typing import List, Tuple
 import pygame
 from src.entities import PacMan
 from src.error import NoSpawnError
@@ -24,7 +25,8 @@ from src.renderer import (HUD_HEIGHT, TAILLE_CASE, ask_name, display_endgame,
 TOP_SHOWN = 5
 USAGE = "usage: python3 pac-man.py config.json"
 
-def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
+
+def find_spawn(maze: List[List[int]]) -> Tuple[int, int]:
     """Returns (col, row) of the walkable cell nearest the maze center.
 
     Cells with value 15 have walls on all four sides (solid blocks), so
@@ -46,9 +48,10 @@ def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
         raise NoSpawnError()
     return best
 
-def new_maze(level: Level) -> list[list[int]]:
+
+def new_maze(level: Level) -> List[List[int]]:
     """Generates a fresh maze of the size asked by `level`."""
-    maze: list[list[int]] = MazeGenerator(
+    maze: List[List[int]] = MazeGenerator(
         size=(level.width, level.height),
         seed=random.randint(0, 1000)).maze
     return maze
@@ -70,7 +73,7 @@ def open_window(level: Level, max_height: int, max_width: int,
 
 def play_run(screen: pygame.Surface,
              config: Config, max_height: int,
-             max_width: int) -> tuple[bool, int, pygame.Surface]:
+             max_width: int) -> Tuple[bool, int, pygame.Surface]:
     """Plays the levels in order until one is lost or all are cleared.
 
     Returns (won, total score, window), the window being returned because
@@ -80,7 +83,9 @@ def play_run(screen: pygame.Surface,
     pacman = PacMan(0, 0,
                     maze_infos=(0, 0),
                     hp=config.lives)
+    level_number = 0
     for level in config.levels:
+        level_number += 1
         maze = new_maze(level)
         spawn_col, spawn_row = find_spawn(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
@@ -91,7 +96,8 @@ def play_run(screen: pygame.Surface,
                             screen=screen,
                             maze_surface=draw_maze(maze),
                             config=config,
-                            level=level).run()
+                            level=level,
+                            level_number=level_number).run()
         pacman.targetable = True
         pacman.eats_everything = False
         pacman.chase_swich = time()
@@ -117,7 +123,8 @@ def game_loop(config: Config) -> None:
             board.add_score(board.get_player(name), score)
             board.save()
 
-def main(argv: list[str]) -> int:
+
+def main(argv: List[str]) -> int:
     """Checks the arguments, loads the config and runs the game."""
     if len(argv) != 2:
         print(f"{USAGE}: expected 1 argument, got {len(argv) - 1}.",

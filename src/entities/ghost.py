@@ -2,7 +2,7 @@ from .entity import Entity
 from .pos import Pos
 import random
 from time import time
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List
 
 SCARED = [
     "assets/scared_ghost/scared_1.png",
@@ -17,7 +17,7 @@ class Ghost(Entity):
                  maze_infos: Tuple[int, int], hp: int = 1,
                  targetable: bool = False, speed: int = 1) -> None:
         super().__init__(pos_x, pos_y, hp, targetable, maze_infos,
-                         speed, player=False, size=8)
+                         speed, player=False)
         self.target_tile = (0, 0)
         self.mooves = [('N', 0, -1), ('W', -1, 0), ('S', 0, 1), ('E', 1, 0)]
         self.pac_man_pos = pac_man_pos
@@ -43,14 +43,14 @@ class Ghost(Entity):
         """
         pass
 
-    def find_target_tile(self, avb_cells: list[tuple[int, int]],
-                         maze: list[list[int]]) -> None:
+    def find_target_tile(self, avb_cells: List[tuple[int, int]],
+                         maze: List[List[int]]) -> None:
         """
             calls the right function depending on the ghost's
             and pacman's state
 
             avb_cells: cells of the maze that are reachable
-            maze: list of the maze
+            maze: List of the maze
         """
         if not self.alive:
             self.go_spawn()
@@ -103,7 +103,7 @@ class Ghost(Entity):
         self.dist_from_pac_man = self.get_dist(self.pos.get_pos(),
                                                self.pac_man_pos.get_pos())
 
-    def run_away(self, maze: list[list[int]]) -> Tuple[int, int]:
+    def run_away(self, maze: List[List[int]]) -> Tuple[int, int]:
         """
         sets the target_tile to the farthest away corner
         """
@@ -152,7 +152,7 @@ class Ghost(Entity):
                 self.target_tile = choose_x, choose_y
         return (self.target_tile)
 
-    def random_dir(self, avb_cells: list[tuple[int, int]]) -> Tuple[int, int]:
+    def random_dir(self, avb_cells: List[tuple[int, int]]) -> Tuple[int, int]:
         self.target_tile = random.choice(avb_cells)
         return (self.target_tile)
 

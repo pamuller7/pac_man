@@ -28,8 +28,8 @@ class Level(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    width: int = Field(20, gt=0, description="maze width, in cells")
-    height: int = Field(10, gt=0, description="maze height, in cells")
+    width: int = Field(20, gt=1, description="maze width, in cells")
+    height: int = Field(10, gt=1, description="maze height, in cells")
     pacgum: int = Field(10000, gt=0, description="pacgums to eat to win")
 
 

@@ -4,6 +4,7 @@ import pygame
 import random
 from src.renderer.display import JAUNE
 from time import time
+from typing import List, Tuple
 
 # from src.entities import entity
 
@@ -54,7 +55,7 @@ def slide(value: float, target: float, step: float) -> float:
     return value
 
 
-def validate_maze(maze: list[list[int]]) -> None:
+def validate_maze(maze: List[List[int]]) -> None:
     """Checks the maze grid before the game starts.
 
     Raises:
@@ -73,7 +74,7 @@ def validate_maze(maze: list[list[int]]) -> None:
                 raise InvalidCellError(value, (x, y))
 
 
-def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
+def find_spawn(maze: List[List[int]]) -> Tuple[int, int]:
     """Returns (col, row) of the walkable cell nearest the maze center.
 
     Cells with value 15 have walls on all four sides (solid blocks), so
@@ -96,7 +97,7 @@ def find_spawn(maze: list[list[int]]) -> tuple[int, int]:
     return best
 
 
-def find_corner(maze: list[list[int]]) -> list[tuple[int, int]]:
+def find_corner(maze: List[List[int]]) -> List[Tuple[int, int]]:
     """Returns the four corner cells of the maze, ghost spawn points."""
     rows, cols = len(maze), len(maze[0])
     return ([(0, 0), (0, rows - 1), (cols - 1, 0), (cols - 1, rows - 1)])
@@ -110,7 +111,8 @@ class Engine:
     caller so they survive from one game to the next.
     """
 
-    def __init__(self, maze: list[list[int]], player: PacMan,
+    def __init__(self, maze: List[List[int]], player: PacMan,
+                 level_number: int,
                  screen: pygame.Surface | None = None,
                  maze_surface: pygame.Surface | None = None,
                  config: Config | None = None,
@@ -128,34 +130,40 @@ class Engine:
             NoSpawnError: if the maze has no walkable spawn cell.
             AssetError: if the Pac-Man sprite cannot be loaded.
         """
-        validate_maze(maze)
         Entity.reset_all()
         Pacgum.reset_all()
-        self.time_spent = time()
-        self.time_frozen = False
-        self.freeze_time_start = 0.0
-        self.config = config or Config()
-        self.level = level or self.config.levels[0]
+
         self.maze = maze
-        self.corners, self.others = self.find_corner_and_other_cells(maze)
-
-        red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
-        maze_infos = (len(maze[0]) - 1, len(maze) - 1)
+        validate_maze(maze)
         self.pacman = player
-
-        pygame.init()
-        pygame.display.set_caption("ᗧ Pac-Man ᗧ")
         if screen is None:
             height = len(maze) * TAILLE_CASE + HUD_HEIGHT
             width = len(maze[0]) * TAILLE_CASE
             screen = pygame.display.set_mode((width, height))
+        pygame.init()
+        pygame.display.set_caption("ᗧ Pac-Man ᗧ")
         self.screen = screen
-        self.frame_count = 0
-        self.clock = pygame.time.Clock()
         self.maze_surface = maze_surface or draw_maze(maze)
+        self.config = config or Config()
+        self.level = level or self.config.levels[0]
+        self.level_number = level_number
+
         self.origin_x, self.origin_y = self._center_maze()
+        self.clock = pygame.time.Clock()
+        self.frame_count = 0
+
+        self.time_spent = time()
+        self.time_frozen = False
+        self.freeze_time_start = 0.0
+        self.corners, self.others = self.find_corner_and_other_cells(maze)
+
+        self.buffered_dir: str | None = None
+        self.skip_level = False
+
         self.spawn_pacgums(maze, self.config.pacgum)
 
+        red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
+        maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
                                 self.pacman.pos, maze_infos=maze_infos),
                        BlueGhost(blue_pos[0], blue_pos[1],
@@ -167,15 +175,18 @@ class Engine:
         Entity.entities.append(self.pacman)
         for ghost in self.ghosts:
             ghost.score = self.config.points_per_ghost
-        self.buffered_dir: str | None = None
-        self.skip_level = False
 
     def find_corner_and_other_cells(self,
-                                    maze: list[list[int]]
-                                    ) -> tuple[list[tuple[int, int]],
-                                               list[tuple[int, int]]]:
-        corners: list[tuple[int, int]] = []
-        others: list[tuple[int, int]] = []
+                                    maze: List[List[int]]
+                                    ) -> Tuple[List[Tuple[int, int]],
+                                               List[Tuple[int, int]]]:
+        """
+            returns 2 lists:
+                -> the List of maze's corner
+                -> the List of others cells reachable (!=15)
+        """
+        corners: List[Tuple[int, int]] = []
+        others: List[Tuple[int, int]] = []
         for y, line in enumerate(maze):
             for x, cell in enumerate(line):
                 if cell == 15:
@@ -185,21 +196,21 @@ class Engine:
                 (corners if is_corner else others).append((x, y))
         return (corners, others)
 
-    def spawn_pacgums(self, maze: list[list[int]], count: int) -> None:
+    def spawn_pacgums(self, maze: List[List[int]], count: int) -> None:
         """Spreads at most `count` pacgums over the walkable cells.
 
         The walkable corners always get a super pacgum; the remaining
         cells are picked at a regular interval so the pacgums stay spread
         over the whole maze instead of piling up on the first rows.
         """
+        random.shuffle(self.others)
+        random.shuffle(self.corners)
         left = count - len(self.corners)
         if left < len(self.others):
             step = len(self.others) / max(left, 1)
             others = [self.others[int(i * step)] for i in range(max(left, 0))]
         else:
             others = self.others
-        random.shuffle(self.corners)
-        random.shuffle(others)
         for x, y in self.corners[:count]:
             Pacgum(x, y, True, self.config.points_per_super_pacgum)
         for x, y in others:
@@ -222,7 +233,7 @@ class Engine:
         dim = (TAILLE_CASE//div, TAILLE_CASE//div)
         return pygame.transform.scale(image, dim)
 
-    def run(self) -> tuple[bool, int]:
+    def run(self) -> Tuple[bool, int]:
         """Main loop. Returns (won, score) once the game is over.
 
         The engine does not show the endgame screen nor decide what comes
@@ -299,7 +310,6 @@ class Engine:
                         self.pacman.hp += 1
                     if event.key == pygame.K_t:
                         self._toggle_time_freeze()
-            # self.clock.tick(60)
 
     def _toggle_time_freeze(self) -> None:
         """Toggles the level timer freeze (key 't')."""
@@ -343,7 +353,7 @@ class Engine:
         if entity.facing and entity.can_move(self.maze, entity.facing):
             entity.try_move(self.maze, entity.facing)
 
-    def _center_maze(self) -> tuple[int, int]:
+    def _center_maze(self) -> Tuple[int, int]:
         """Returns the pixel where the top-left maze cell is drawn.
 
         The window is opened once for the whole run, so a level smaller
@@ -376,7 +386,8 @@ class Engine:
             self.screen.blit(sprite, (x, y))
         draw_text(self.screen,
                   f"score: {self.pacman.score}, hp: {self.pacman.hp},\
-   {self.config.level_max_time - int(self._get_current_time())}s",
+   {self.config.level_max_time - int(self._get_current_time())}s,\
+    level: {self.level_number}",
                   36, (0, 0), JAUNE, centre=False)
         pygame.display.flip()
 

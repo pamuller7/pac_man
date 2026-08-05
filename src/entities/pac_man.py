@@ -1,5 +1,6 @@
 from .entity import Entity
 from time import time
+from typing import Tuple
 
 UNTARGET_ASSETS = {
     "N": ["assets/super_pac_man/up/up_1.png",
@@ -42,11 +43,11 @@ PAC_MAN_ASSETS = {
 
 class PacMan(Entity):
     def __init__(self, pos_x: int, pos_y: int,
-                 maze_infos: tuple[int, int],
+                 maze_infos: Tuple[int, int],
                  hp: int = 1, targetable: bool = True) -> None:
         super().__init__(pos_x=pos_x, pos_y=pos_y, hp=hp,
                          targetable=targetable, maze_infos=maze_infos,
-                         speed=2, player=True, size=8)
+                         speed=2, player=True)
         self.score = 0
         self.god_mod = False
         self.eats_everything = False

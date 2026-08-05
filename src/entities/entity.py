@@ -1,6 +1,6 @@
 from .pos import Pos
 from ..error import DirectionError
-from typing import List, Tuple
+from typing import List, Tuple, Any, Dict
 from collections import deque
 import math
 from time import time
@@ -18,40 +18,49 @@ class Entity:
 
     def __init__(self, pos_x: int, pos_y: int, hp: int,
                  targetable: bool, maze_infos: Tuple[int, int],
-                 speed: int = 2, player: bool = False, size: int = 8,
+                 speed: int = 2, player: bool = False,
                  facing: str = "N") -> None:
         """Initializes a new entity and registers it globally.
+        pos_x, pos_y: pos of the created item
+        hp: current hp
+        targetable: bool, says if the entity can be killed
+        maze_infos: (max x, max y) cell of the maze.
+        speed: the speed of each movable entity
+        player: tells if the entity is playable or a bot
+        facing: the current dir entity is facing
 
-        `maze_infos` is the (max x, max y) cell of the maze.
+        once created, appends the entity in self.entities
         """
         self.pos = Pos(pos_x, pos_y)
-        self.init_pos = (pos_x, pos_y)
         self.hp = hp
-        self.god_mod = False
-        self.score = 200
-        self.respawn_time = 5
-        self.dead_since = 0.0
-        self.chase_swich = time()
-        self.normal_behaviour = True
+        self.speed = speed
+        self.player = player
+        self.facing = facing
         self.maze_infos = maze_infos
         self.targetable = targetable
-        self.tick = 0
-        self.speed = speed
-        self.super_duration = 5
-        self.player = player
-        self.size = size
-        self.facing = facing
-        self.alive = True
-        self.speed = speed
+
+        self.init_pos = (pos_x, pos_y)
         self.target_tile = (pos_x, pos_y)
-        self.shortest_path = ""
-        self.sprite = ""
         self.render_x = float(pos_x * 40)
         self.render_y = float(pos_y * 40)
+
+        self.god_mod = False
+        self.normal_behaviour = True
+        self.alive = True
+
+        self.score = 200
+        self.respawn_time = 5
+        self.super_duration = 5
+        self.dead_since = 0.0
+        self.chase_swich = time()
+        self.tick = 0
+        self.shortest_path = ""
+        self.sprite = ""
+
         self.entities.append(self)
 
     def set_init_pos(self, pos_x: int, pos_y: int,
-                     maze_infos: tuple[int, int]) -> None:
+                     maze_infos: Tuple[int, int]) -> None:
         self.pos.set(pos_x, pos_y)      # mute l'objet existant
         self.init_pos = (pos_x, pos_y)
         self.maze_infos = maze_infos
@@ -149,8 +158,8 @@ class Entity:
         """
         pass
 
-    def find_target_tile(self, avb_cells: list[tuple[int, int]],
-                         maze: list[list[int]]) -> None:
+    def find_target_tile(self, avb_cells: List[Tuple[int, int]],
+                         maze: List[List[int]]) -> None:
         """Chooses the cell the entity walks toward.
 
         Only the entities driven by the game (the ghosts) override it;
@@ -177,7 +186,7 @@ class Entity:
         goal = target
         height = len(maze)
         width = len(maze[0])
-        prev: dict = {start: None}
+        prev: Dict[Tuple[int, int], Any] = {start: None}
         queue = deque([start])
         while queue:
             x, y = queue.popleft()

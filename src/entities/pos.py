@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 class Pos:
     def __init__(self, x: int, y: int) -> None:
         """
@@ -27,7 +30,7 @@ class Pos:
         self.x += moove
         self.facing = "E"
 
-    def get_pos(self) -> tuple[int, int]:
+    def get_pos(self) -> Tuple[int, int]:
         return (self.x, self.y)
 
     def get_facing(self) -> str:

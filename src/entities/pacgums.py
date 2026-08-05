@@ -1,12 +1,12 @@
 from src.entities.pac_man import PacMan
-
+from typing import Dict, Tuple
 from .pos import Pos
 
 SPRITE = ["assets/pacgums/pacgum.png"]
 
 
 class Pacgum:
-    pacgums: dict[tuple[int, int], 'Pacgum'] = dict()
+    pacgums: Dict[Tuple[int, int], 'Pacgum'] = dict()
 
     def __init__(self, pos_x: int, pos_y: int,
                  super_pacgum: bool, score: int):

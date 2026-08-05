@@ -5,6 +5,7 @@ without opening a display.
 """
 
 from datetime import datetime
+from typing import Any, Dict
 
 from ..error import InvalidNameError
 
@@ -62,8 +63,8 @@ class Player:
             return True
         return False
 
-    def to_dict(self) -> dict:
-        """Returns the profile as a JSON-serialisable dict."""
+    def to_dict(self) -> Dict[str, Any]:
+        """Returns the profile as a JSON-serialisable Dict."""
         return {
             "name": self.name,
             "created_at": self.created_at,
@@ -72,7 +73,7 @@ class Player:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Player":
+    def from_dict(cls, data: Dict[str, Any]) -> "Player":
         """Rebuilds a profile from `to_dict` output.
 
         Raises:

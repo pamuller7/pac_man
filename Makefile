@@ -24,12 +24,13 @@ clean:
 
 lint:
 	@echo "linting..."
-	flake8 src
+	flake8 src pac-man.py
 	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 
 lint-strict:
 	@echo "linting strictly..."
+	mypy . --strict --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 
 .PHONY: install run debug clean lint lint-strict
