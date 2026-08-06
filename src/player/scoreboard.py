@@ -50,7 +50,8 @@ class Scoreboard:
             reinit = 't'
             while reinit != 'y' and reinit != 'n':
                 reinit = input(f"Do you want to save the current content \
-of {self.path} in 'corrupted_scores.txt' and rewrite {self.path} ? (y/n) ")
+of {self.path} in 'corrupted_scores.txt' and \
+reinitialize {self.path} ? (y/n): ")
             if reinit == 'y':
                 print("Reinitialising the file")
                 with open(self.path, "r") as file:
