@@ -54,13 +54,22 @@ class Scoreboard:
         folder = os.path.dirname(self.path)
         if folder:
             os.makedirs(folder, exist_ok=True)
+        players = [player.to_dict() for player in self.players.values()]
+        players.sort(key=lambda x: x["best_score"])
+        if len(players) > 10:
+            players.pop(0)
+        scores = [list(entry) for entry in self.scores]
+        scores.sort(key=lambda x: x[1])
+        if len(scores) > 10:
+            scores.pop(0)
         data = {
-            "players": [player.to_dict() for player in self.players.values()],
-            "scores": [list(entry) for entry in self.scores],
+            "players": players,
+            "scores": scores,
         }
         tmp_path = f"{self.path}.tmp"
         with open(tmp_path, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=2)
+        print(data)
         os.replace(tmp_path, self.path)
 
     def get_player(self, name: str) -> Player:
