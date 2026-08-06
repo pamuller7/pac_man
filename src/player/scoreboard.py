@@ -27,6 +27,8 @@ class Scoreboard:
     def load(self) -> None:
         """Reads the file. Does nothing if it does not exist yet.
 
+        if an error occurs:
+            asks to the user to resolve it automaticly or exit
         Raises:
             ScoreboardCorruptedError: if the file is not readable JSON or
                 does not have the expected shape.
@@ -43,7 +45,25 @@ class Scoreboard:
             self.scores = [(name, int(score))
                            for name, score in data["scores"]]
         except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
-            raise ScoreboardCorruptedError(self.path, str(exc)) from exc
+            error = ScoreboardCorruptedError(self.path, str(exc))
+            print(error)
+            reinit = 't'
+            while reinit != 'y' and reinit != 'n':
+                reinit = input(f"Do you want to save the current content \
+of {self.path} in 'corrupted_scores.txt' and rewrite {self.path} ? (y/n) ")
+            if reinit == 'y':
+                print("Reinitialising the file")
+                with open(self.path, "r") as file:
+                    corrupted_data = file.read()
+                print("corrupted data can be found in 'corrupted_scores.txt'")
+                with open("corrupted_scores.txt", "w") as file:
+                    file.write(corrupted_data)
+                with open(self.path, "w", encoding="utf-8") as file:
+                    new_data = {"players": [],
+                                "scores": []}
+                    json.dump(new_data, file)
+            else:
+                raise error from exc
 
     def save(self) -> None:
         """Writes the board to disk, creating the folder if needed.
