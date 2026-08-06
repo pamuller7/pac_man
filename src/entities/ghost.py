@@ -58,11 +58,11 @@ class Ghost(Entity):
             self.nomal_proc()
         elif not self.normal_behaviour and not self.targetable:
             if self.dist_from_pac_man < 3:
-                self.run_away(maze)
+                self.go_to_corner(1)
             else:
                 self.random_dir(avb_cells)
         else:
-            self.run_away(maze)
+            self.go_to_corner(1)
 
     def set_speed(self, amount: int) -> None:
         if not self.freeze:
@@ -103,9 +103,11 @@ class Ghost(Entity):
         self.dist_from_pac_man = self.get_dist(self.pos.get_pos(),
                                                self.pac_man_pos.get_pos())
 
-    def run_away(self, maze: List[List[int]]) -> Tuple[int, int]:
+    def go_to_corner(self, key: int = 1) -> Tuple[int, int]:
         """
-        sets the target_tile to the farthest away corner
+        sets the target_tile to the farthest or closest corner
+        key: 1 if farthest away
+             -1 for the closest one
         """
         px, py = self.pac_man_pos.get_pos()
         max_x_maze, max_y_maze = self.maze_infos
@@ -115,7 +117,14 @@ class Ghost(Entity):
             (0, max_y_maze),
             (max_x_maze, max_y_maze),
         ]
-        self.target_tile = max(
+        if key == 1:
+            func = max
+        elif key == -1:
+            func = min
+        else:
+            return self.target_tile
+
+        self.target_tile = func(
             corners,
             key=lambda corner: self.get_dist(corner, (px, py))
         )
@@ -249,8 +258,9 @@ class OrangeGhost(Ghost):
 
     def nomal_proc(self) -> None:
         """
-            Si Pac-Man est loin, il cible le centre du labyrinthe.
-            S'il s'approche trop de Pac-Man, il fuit vers son coin d'origine
+            Si Pac-Man is far, goes to the center of the maze.
+            If he is close, track him
+            else goes to the closest corner
         """
 
         if self.dist_from_pac_man > 8:
@@ -258,6 +268,8 @@ class OrangeGhost(Ghost):
             self.target_tile = (x//2, y//2)
         elif self.dist_from_pac_man <= 2:
             self.tracking()
+        else:
+            self.go_to_corner(-1)
 
 
 class PurpuleGhost(Ghost):

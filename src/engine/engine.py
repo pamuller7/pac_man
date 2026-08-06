@@ -113,6 +113,7 @@ class Engine:
 
     def __init__(self, maze: List[List[int]], player: PacMan,
                  level_number: int,
+                 sprite_cache: dict[tuple[str, int], pygame.Surface],
                  screen: pygame.Surface | None = None,
                  maze_surface: pygame.Surface | None = None,
                  config: Config | None = None,
@@ -156,6 +157,7 @@ class Engine:
         self.time_frozen = False
         self.freeze_time_start = 0.0
         self.corners, self.others = self.find_corner_and_other_cells(maze)
+        self._sprite_cache = sprite_cache
 
         self.buffered_dir: str | None = None
         self.skip_level = False
@@ -216,22 +218,39 @@ class Engine:
         for x, y in others:
             Pacgum(x, y, False, self.config.points_per_pacgum)
 
-    @staticmethod
-    def load_sprite(path: str, div: int = 1) -> pygame.Surface:
-        """Loads and scales a sprite to one cell.
+    def load_sprite(self, path: str, div: int = 1) -> pygame.Surface:
+        """Loads, scales and caches a sprite.
+
+        The sprite is loaded from disk only once. Subsequent calls with the
+        same image path and scale factor return the cached surface instead
+        of reloading and rescaling the image.
+
+        Args:
+            path: Path to the image file.
+            div: Scale divisor applied to the default cell size.
+
+        Returns:
+            The loaded and scaled sprite as a pygame Surface.
 
         Raises:
-            AssetNotFoundError: if the file does not exist.
-            AssetError: if pygame fails to decode it.
+            AssetNotFoundError: If the image file does not exist.
+            AssetError: If pygame cannot load or decode the image.
         """
+        key = (path, div)
+        if key in self._sprite_cache:
+            return self._sprite_cache[key]
         if not os.path.exists(path):
             raise AssetNotFoundError(path)
         try:
             image = pygame.image.load(path).convert_alpha()
         except pygame.error as exc:
             raise AssetError(path, str(exc)) from exc
-        dim = (TAILLE_CASE//div, TAILLE_CASE//div)
-        return pygame.transform.scale(image, dim)
+        sprite = pygame.transform.scale(
+            image,
+            (TAILLE_CASE // div, TAILLE_CASE // div),
+        )
+        self._sprite_cache[key] = sprite
+        return sprite
 
     def run(self) -> Tuple[bool, int]:
         """Main loop. Returns (won, score) once the game is over.

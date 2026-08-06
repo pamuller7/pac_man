@@ -73,7 +73,9 @@ def open_window(level: Level, max_height: int, max_width: int,
 
 def play_run(screen: pygame.Surface,
              config: Config, max_height: int,
-             max_width: int) -> Tuple[bool, int, pygame.Surface]:
+             max_width: int,
+             sprite_cache: dict[tuple[str, int], pygame.Surface]
+             ) -> Tuple[bool, int, pygame.Surface]:
     """Plays the levels in order until one is lost or all are cleared.
 
     Returns (won, total score, window), the window being returned because
@@ -100,6 +102,7 @@ def play_run(screen: pygame.Surface,
         screen = open_window(level, max_height, max_width, screen)
         won, score = Engine(maze=maze,
                             player=pacman,
+                            sprite_cache=sprite_cache,
                             screen=screen,
                             maze_surface=draw_maze(maze),
                             config=config,
@@ -127,9 +130,11 @@ def game_loop(config: Config) -> None:
     board.load()
     max_width = max(var.width for var in config.levels)
     max_height = max(var.height for var in config.levels)
+    sprite_cache: dict[tuple[str, int], pygame.Surface] = dict()
     screen = open_window(config.levels[0], max_height, max_width)
     while main_menu(screen, board.top(TOP_SHOWN)):
-        won, score, screen = play_run(screen, config, max_height, max_width)
+        won, score, screen = play_run(screen, config, max_height,
+                                      max_width, sprite_cache)
         if not display_endgame(screen, score, won):
             break
         name = ask_name(screen, won, score)
