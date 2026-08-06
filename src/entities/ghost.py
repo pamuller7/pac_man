@@ -166,7 +166,6 @@ class RedGhost(Ghost):
                          maze_infos=maze_infos,
                          speed=speed)
         Ghost.ghosts.update({"red": self})
-        self.chill = self.chase_limit
         self.assets = {
             "swich": SCARED,
             "dead": "assets/dead_ghost/dead.png",
