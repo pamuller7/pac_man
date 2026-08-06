@@ -5,12 +5,8 @@ SHELL := /bin/bash
 INSTALLED = .venv/.installed
 
 
-install: $(INSTALLED)
-
-$(INSTALLED):
+install:
 	uv sync
-	uv pip install mazegenerator-2.1.0-py3-none-any.whl
-	@touch $(INSTALLED)
 
 run: install
 	uv run pac-man.py config.json

@@ -1,7 +1,8 @@
 import pygame
-from ..display import draw_text, JAUNE, NOIR
+from src.renderer.display import draw_text, JAUNE, NOIR
+from path import resource_path
 import os
-from ...error import AssetNotFoundError, AssetError
+from src.error import AssetNotFoundError, AssetError
 
 
 def load_sprite(path: str, screen: pygame.Surface) -> pygame.Surface:
@@ -11,6 +12,7 @@ def load_sprite(path: str, screen: pygame.Surface) -> pygame.Surface:
         AssetNotFoundError: if the file does not exist.
         AssetError: if pygame fails to decode it.
     """
+    path = resource_path(path)
     if not os.path.exists(path):
         raise AssetNotFoundError(path)
     try:

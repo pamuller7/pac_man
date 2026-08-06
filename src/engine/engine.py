@@ -2,6 +2,7 @@ import os
 
 import pygame
 import random
+from path import resource_path
 from src.renderer.display import JAUNE
 from time import time
 from typing import List, Tuple
@@ -236,6 +237,7 @@ class Engine:
             AssetNotFoundError: If the image file does not exist.
             AssetError: If pygame cannot load or decode the image.
         """
+        path = resource_path(path)
         key = (path, div)
         if key in self._sprite_cache:
             return self._sprite_cache[key]

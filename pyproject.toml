@@ -8,7 +8,11 @@ dependencies = [
     "pygame",
     "pydantic>=2",
     "mypy==2.3.0",
-    ]
+    "mazegenerator",
+]
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
+
+[tool.uv.sources]
+mazegenerator = { path = "mazegenerator-2.1.0-py3-none-any.whl" }

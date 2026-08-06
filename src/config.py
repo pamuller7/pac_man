@@ -12,6 +12,7 @@ program must be able to fail cleanly) before any window is opened.
 import json
 import re
 
+from path import resource_path
 from typing import Any
 from pydantic import (
     BaseModel,
@@ -204,6 +205,7 @@ def load_config(path: str) -> Config:
             or holds a value the game cannot use. The message always says
             which key is wrong.
     """
+    path = resource_path(path)
     try:
         with open(path, encoding="utf-8") as file:
             raw = file.read()
