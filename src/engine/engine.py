@@ -253,7 +253,6 @@ class Engine:
             if (not self.pacman.alive):
                 running = False
             elif (self._get_current_time() >= self.config.level_max_time):
-                won = True
                 running = False
             elif not Pacgum.pacgums:
                 won = True
