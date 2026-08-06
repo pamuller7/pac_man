@@ -58,8 +58,7 @@ class Scoreboard:
         players.sort(key=lambda x: x["best_score"])
         if len(players) > 10:
             players.pop(0)
-        scores = [list(entry) for entry in self.scores]
-        scores.sort(key=lambda x: x[1])
+        scores = sorted(self.scores, key=lambda entry: entry[1])
         if len(scores) > 10:
             scores.pop(0)
         data = {
