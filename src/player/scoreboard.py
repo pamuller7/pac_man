@@ -6,6 +6,7 @@ its JSON file.
 
 import json
 import os
+from typing import Any
 
 from ..error import ScoreboardCorruptedError
 from .player import Player
@@ -60,8 +61,8 @@ reinitialize {self.path} ? (y/n): ")
                 with open("corrupted_scores.txt", "w") as file:
                     file.write(corrupted_data)
                 with open(self.path, "w", encoding="utf-8") as file:
-                    new_data = {"players": [],
-                                "scores": []}
+                    new_data: dict[str, list[Any]] = {"players": [],
+                                                      "scores": []}
                     json.dump(new_data, file)
                 print("\033[32m[Resolved]\033[0m corrupted data can be \
 found in 'corrupted_scores.txt'")

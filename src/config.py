@@ -71,14 +71,14 @@ class Level(BaseModel):
         width = get_int(data, "width", 20)
         data["width"] = max(15, min(width, 60))
         if data["width"] != width:
-            print(f"\033[33m[Warning]\033[0m 'width': {width} not between 15 and 60. \
-'width' set to {data['width']}")
+            print(f"\033[33m[Warning]\033[0m 'width': {width} \
+not between 15 and 60. 'width' set to {data['width']}")
 
         height = get_int(data, "height", 20)
         data["height"] = max(15, min(height, 30))
         if data["height"] != height:
-            print(f"\033[33m[Warning]\033[0m 'height': {height} not between 15 and 60.\
- 'height' set to {data['height']}")
+            print(f"\033[33m[Warning]\033[0m 'height': {height} \
+not between 15 and 60. 'height' set to {data['height']}")
 
         seed = get_int(data, "seed", 42)
         data["seed"] = seed if seed >= 0 else 42
