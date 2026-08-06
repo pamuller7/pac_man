@@ -18,7 +18,8 @@ def get_font(taille: int) -> pygame.font.Font:
 
 
 def draw_text(surface: pygame.Surface, texte: str, taille: int,
-              position: tuple[int, int], couleur: tuple[int, int, int] = YELLOW,
+              position: tuple[int, int],
+              couleur: tuple[int, int, int] = YELLOW,
               centre: bool = True) -> pygame.Rect:
     """
     Rends du texte et le blit sur la surface.
