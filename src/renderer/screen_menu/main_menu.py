@@ -1,5 +1,5 @@
 import pygame
-from src.renderer.display import draw_text, JAUNE, NOIR
+from src.renderer.display import draw_text, YELLOW, BLACK
 from path import resource_path
 import os
 from src.error import AssetNotFoundError, AssetError
@@ -27,12 +27,12 @@ def load_sprite(relative_path: str, screen: pygame.Surface) -> pygame.Surface:
 def instructions_menu(screen: pygame.Surface) -> None:
     """Displays the game instructions until the user presses a key."""
     centre_x = screen.get_width() // 2
-    screen.fill(NOIR)
+    screen.fill(BLACK)
     try:
         screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
     except (AssetNotFoundError, AssetError):
         pass
-    draw_text(screen, "INSTRUCTIONS", 50, (centre_x, 60), JAUNE)
+    draw_text(screen, "INSTRUCTIONS", 50, (centre_x, 60), YELLOW)
     instructions = [
         "Arrow keys or [w,a,s,d] : Move Pac-Man",
         "Eat all pacgums to complete the level.",
@@ -44,7 +44,7 @@ def instructions_menu(screen: pygame.Surface) -> None:
 
     y = 140
     for line in instructions:
-        draw_text(screen, line, 28, (centre_x, y), JAUNE)
+        draw_text(screen, line, 28, (centre_x, y), YELLOW)
         y += 40
     pygame.display.flip()
     while True:
@@ -70,22 +70,22 @@ def main_menu(screen: pygame.Surface,
     centre_y = screen.get_height() // 2
     pygame.event.clear()
     while True:
-        screen.fill(NOIR)
+        screen.fill(BLACK)
         try:
             screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
         except (AssetNotFoundError, AssetError):
             pass
-        draw_text(screen, "PAC-MAN", 60, (centre_x, centre_y - 120), JAUNE)
+        draw_text(screen, "PAC-MAN", 60, (centre_x, centre_y - 120), YELLOW)
         draw_text(screen, "ESPACE : JOUER   -   ECHAP : QUITTER", 30,
-                  (centre_x, centre_y - 60), JAUNE)
+                  (centre_x, centre_y - 60), YELLOW)
         draw_text(screen, "I : INSTRUCTIONS", 30,
-                  (centre_x, centre_y - 10), JAUNE)
+                  (centre_x, centre_y - 10), YELLOW)
         if scores:
             draw_text(screen, "MEILLEURS SCORES", 30,
-                      (centre_x, centre_y + 60), JAUNE)
+                      (centre_x, centre_y + 60), YELLOW)
             for rank, (name, score) in enumerate(scores):
                 draw_text(screen, f"{rank + 1}. {name} - {score}", 25,
-                          (centre_x, centre_y + 100 + rank * 25), JAUNE)
+                          (centre_x, centre_y + 100 + rank * 25), YELLOW)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

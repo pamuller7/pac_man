@@ -3,7 +3,7 @@ import os
 import pygame
 import random
 from path import resource_path
-from src.renderer.display import JAUNE
+from src.renderer.display import YELLOW
 from time import time
 from typing import List, Tuple
 
@@ -25,7 +25,7 @@ from ..error import (
     MalformedMazeError,
     NoSpawnError,
 )
-from ..renderer import (TAILLE_CASE,
+from ..renderer import (CELL_SIZE,
                         HUD_HEIGHT,
                         draw_maze,
                         draw_text,
@@ -139,8 +139,8 @@ class Engine:
         validate_maze(maze)
         self.pacman = player
         if screen is None:
-            height = len(maze) * TAILLE_CASE + HUD_HEIGHT
-            width = len(maze[0]) * TAILLE_CASE
+            height = len(maze) * CELL_SIZE + HUD_HEIGHT
+            width = len(maze[0]) * CELL_SIZE
             screen = pygame.display.set_mode((width, height))
         pygame.init()
         pygame.display.set_caption("ᗧ Pac-Man ᗧ")
@@ -249,7 +249,7 @@ class Engine:
             raise AssetError(path, str(exc)) from exc
         sprite = pygame.transform.scale(
             image,
-            (TAILLE_CASE // div, TAILLE_CASE // div),
+            (CELL_SIZE // div, CELL_SIZE // div),
         )
         self._sprite_cache[key] = sprite
         return sprite
@@ -347,12 +347,12 @@ class Engine:
         for entity in Entity.entities:
             entity.update_entity(self.frame_count)
             entity.check_eaten()
-            target_x = entity.pos.x * TAILLE_CASE
-            target_y = entity.pos.y * TAILLE_CASE
+            target_x = entity.pos.x * CELL_SIZE
+            target_y = entity.pos.y * CELL_SIZE
             if entity.render_x == target_x and entity.render_y == target_y:
                 self.step(entity)
-                target_x = entity.pos.x * TAILLE_CASE
-                target_y = entity.pos.y * TAILLE_CASE
+                target_x = entity.pos.x * CELL_SIZE
+                target_y = entity.pos.y * CELL_SIZE
 
             step = entity.speed * dt
             entity.render_x = slide(entity.render_x, target_x, step)
@@ -381,9 +381,9 @@ class Engine:
         resized to it. A maze larger than the window is pinned under the
         HUD rather than pushed off screen.
         """
-        free_x = self.screen.get_width() - len(self.maze[0]) * TAILLE_CASE
+        free_x = self.screen.get_width() - len(self.maze[0]) * CELL_SIZE
         free_y = (self.screen.get_height() - HUD_HEIGHT
-                  - len(self.maze) * TAILLE_CASE)
+                  - len(self.maze) * CELL_SIZE)
         return max(free_x // 2, 0), HUD_HEIGHT + max(free_y // 2, 0)
 
     def _draw(self) -> None:
@@ -400,15 +400,15 @@ class Engine:
                 div = 2
             sprite = self.load_sprite(gums.sprite, div)
             x = (self.origin_x + gums.render_x
-                 + (TAILLE_CASE - sprite.get_width()) // 2)
+                 + (CELL_SIZE - sprite.get_width()) // 2)
             y = (self.origin_y + gums.render_y
-                 + (TAILLE_CASE - sprite.get_height()) // 2)
+                 + (CELL_SIZE - sprite.get_height()) // 2)
             self.screen.blit(sprite, (x, y))
         draw_text(self.screen,
                   f"score: {self.pacman.score}, hp: {self.pacman.hp},\
    {self.config.level_max_time - int(self._get_current_time())}s,\
     level: {self.level_number}",
-                  36, (0, 0), JAUNE, centre=False)
+                  36, (0, 0), YELLOW, centre=False)
         pygame.display.flip()
 
     def _skip_level(self) -> bool:

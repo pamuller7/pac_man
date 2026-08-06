@@ -4,7 +4,7 @@ from typing import List, Tuple, Any, Dict
 from collections import deque
 import math
 from time import time
-from ..renderer import TAILLE_CASE
+from ..renderer import CELL_SIZE
 
 
 CODE_DIR = {"N": 1, "E": 2, "S": 4, "W": 8}
@@ -64,8 +64,8 @@ class Entity:
         self.pos.set(pos_x, pos_y)      # mute l'objet existant
         self.init_pos = (pos_x, pos_y)
         self.maze_infos = maze_infos
-        self.render_x = pos_x * TAILLE_CASE
-        self.render_y = pos_y * TAILLE_CASE
+        self.render_x = pos_x * CELL_SIZE
+        self.render_y = pos_y * CELL_SIZE
 
     def get_pos(self) -> Tuple[int, int]:
         """Returns the entity's current position as (x, y)."""
@@ -122,6 +122,9 @@ class Entity:
         return True
 
     def is_eaten(self, hunter: "Entity") -> bool:
+        """
+        Checks the state of the entity. if eatable, looses 1 hp
+        """
         if self.player and self.god_mod:
             return False
         if not (self.alive and hunter.alive):
@@ -243,8 +246,8 @@ class Entity:
     @classmethod
     def collide(cls, entity1: "Entity", entity2: "Entity") -> bool:
         if (
-            abs(entity1.render_x - entity2.render_x) < TAILLE_CASE//2
-            and abs(entity1.render_y - entity2.render_y) < TAILLE_CASE//2
+            abs(entity1.render_x - entity2.render_x) < CELL_SIZE//2
+            and abs(entity1.render_y - entity2.render_y) < CELL_SIZE//2
         ):
             return (True)
         return (False)

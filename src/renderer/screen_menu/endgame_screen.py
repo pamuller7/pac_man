@@ -1,5 +1,5 @@
 import pygame
-from ..display import draw_text, NOIR, JAUNE
+from ..display import draw_text, BLACK, YELLOW
 from .main_menu import load_sprite
 from ...error import AssetNotFoundError, AssetError
 
@@ -15,7 +15,7 @@ def display_endgame(screen: pygame.Surface, score: int = 0,
     centre_x = screen.get_width() // 2
     centre_y = screen.get_height() // 2
 
-    screen.fill(NOIR)
+    screen.fill(BLACK)
 
     titre = "YOU WIN" if won else "GAME OVER"
     sprite = ASSETS[0] if won else ASSETS[1]
@@ -23,10 +23,10 @@ def display_endgame(screen: pygame.Surface, score: int = 0,
         screen.blit(load_sprite(sprite, screen), (0, 10))
     except (AssetNotFoundError, AssetError):
         pass
-    draw_text(screen, titre, 60, (centre_x, centre_y - 45), JAUNE)
-    draw_text(screen, f"SCORE : {score}", 30, (centre_x, centre_y), JAUNE)
+    draw_text(screen, titre, 60, (centre_x, centre_y - 45), YELLOW)
+    draw_text(screen, f"SCORE : {score}", 30, (centre_x, centre_y), YELLOW)
     draw_text(screen, "ESPACE : CONTINUER   -   ECHAP : QUITTER", 30,
-              (centre_x, centre_y + 50), JAUNE)
+              (centre_x, centre_y + 50), YELLOW)
     pygame.display.flip()
 
     pygame.event.clear()

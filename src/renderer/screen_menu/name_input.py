@@ -1,5 +1,5 @@
 import pygame
-from ..display import draw_text, NOIR, JAUNE
+from ..display import draw_text, BLACK, YELLOW
 from ...player import NAME_MAX_LENGTH
 from .main_menu import load_sprite
 from ...error import AssetNotFoundError, AssetError
@@ -37,20 +37,20 @@ def ask_name(screen: pygame.Surface, won: int, score: int = 0) -> str | None:
                     if event.key == pygame.K_RETURN and name.strip():
                         return name.strip()
 
-            screen.fill(NOIR)
+            screen.fill(BLACK)
             sprite = ASSETS[0] if won else ASSETS[1]
             try:
                 screen.blit(load_sprite(sprite, screen), (0, 10))
             except (AssetNotFoundError, AssetError):
                 pass
             draw_text(screen, f"SCORE : {score}", 30,
-                      (centre_x, centre_y - 80), JAUNE)
+                      (centre_x, centre_y - 80), YELLOW)
             draw_text(screen, "ENTREZ VOTRE NOM", 40,
-                      (centre_x, centre_y - 30), JAUNE)
+                      (centre_x, centre_y - 30), YELLOW)
             draw_text(screen, f"{name}_", 40, (centre_x, centre_y + 20),
-                      JAUNE)
+                      YELLOW)
             draw_text(screen, "ENTREE : VALIDER   -   ECHAP : PASSER", 25,
-                      (centre_x, centre_y + 80), JAUNE)
+                      (centre_x, centre_y + 80), YELLOW)
             pygame.display.flip()
     finally:
         pygame.key.stop_text_input()

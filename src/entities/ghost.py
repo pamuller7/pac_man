@@ -189,9 +189,6 @@ class RedGhost(Ghost):
         }
 
     def nomal_proc(self) -> None:
-        """
-            Sa cible est toujours la case exacte où se trouve Pac-Man
-        """
         self.tracking()
 
 
@@ -219,10 +216,9 @@ class BlueGhost(Ghost):
 
     def nomal_proc(self) -> None:
         """
-            Son ciblage dépend à la fois
-            de la position de Rouge et de Pac-Man,
-            (on va dire qu'il cible devant pac man
-            si rouge derrier, derriere pac man sinon)
+            Depends both of red pos and pac man.
+            if red behind pac man, go in front
+            else behind pac man
         """
         pac_x, pac_y = self.pac_man_pos.get_pos()
         red_x, red_y = self.ghosts['red'].pos.get_pos()
@@ -258,7 +254,7 @@ class OrangeGhost(Ghost):
 
     def nomal_proc(self) -> None:
         """
-            Si Pac-Man is far, goes to the center of the maze.
+            if Pac-Man is far, goes to the center of the maze.
             If he is close, track him
             else goes to the closest corner
         """
@@ -295,7 +291,4 @@ class PurpuleGhost(Ghost):
         }
 
     def nomal_proc(self) -> None:
-        """
-            Il cible 4 cases devant la direction que regarde Pac-Man
-        """
         self.going_b4_pac_man()

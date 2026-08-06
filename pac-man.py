@@ -19,7 +19,7 @@ from src.config import Config, Level, load_config
 from src.engine import Engine
 from src.error import PacManError
 from src.player import Scoreboard
-from src.renderer import (HUD_HEIGHT, TAILLE_CASE, ask_name, display_endgame,
+from src.renderer import (HUD_HEIGHT, CELL_SIZE, ask_name, display_endgame,
                           draw_maze, main_menu)
 
 TOP_SHOWN = 5
@@ -64,8 +64,8 @@ def open_window(level: Level, max_height: int, max_width: int,
     A `screen` already at the right size is kept as is: two levels of the
     same size must go on without the window blinking between them.
     """
-    width = max_width * TAILLE_CASE
-    height = max_height * TAILLE_CASE + HUD_HEIGHT
+    width = max_width * CELL_SIZE
+    height = max_height * CELL_SIZE + HUD_HEIGHT
     if screen is not None and screen.get_size() == (width, height):
         return screen
     return pygame.display.set_mode((width, height))

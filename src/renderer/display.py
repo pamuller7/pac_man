@@ -1,11 +1,10 @@
 import pygame
 
-TAILLE_CASE = 40
+CELL_SIZE = 40
 N, E, S, W = 1, 2, 4, 8
-JAUNE = (255, 255, 0)
-NOIR = (0, 0, 0)
-BLANC = (255, 255, 255)
-EPAISSEUR = 3
+YELLOW = (255, 255, 0)
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 HUD_HEIGHT = 50
 
 _FONT_CACHE: dict[int, pygame.font.Font] = {}
@@ -19,7 +18,7 @@ def get_font(taille: int) -> pygame.font.Font:
 
 
 def draw_text(surface: pygame.Surface, texte: str, taille: int,
-              position: tuple[int, int], couleur: tuple[int, int, int] = JAUNE,
+              position: tuple[int, int], couleur: tuple[int, int, int] = YELLOW,
               centre: bool = True) -> pygame.Rect:
     """
     Rends du texte et le blit sur la surface.
@@ -37,18 +36,18 @@ def draw_text(surface: pygame.Surface, texte: str, taille: int,
 def draw_cell(surface: pygame.Surface, col: int, ligne: int,
               valeur: int) -> None:
     """Draws one maze cell (walls) onto the maze surface, pixel by pixel."""
-    start_x = col * TAILLE_CASE
-    start_y = ligne * TAILLE_CASE
-    for i in range(TAILLE_CASE):
-        for j in range(TAILLE_CASE):
+    start_x = col * CELL_SIZE
+    start_y = ligne * CELL_SIZE
+    for i in range(CELL_SIZE):
+        for j in range(CELL_SIZE):
             couleur = None
             if i == 0 and (valeur & N):
                 couleur = (0, 0, 255)
-            elif i == TAILLE_CASE - 1 and (valeur & S):
+            elif i == CELL_SIZE - 1 and (valeur & S):
                 couleur = (0, 0, 255)
             elif j == 0 and (valeur & W):
                 couleur = (0, 0, 255)
-            elif j == TAILLE_CASE - 1 and (valeur & E):
+            elif j == CELL_SIZE - 1 and (valeur & E):
                 couleur = (0, 0, 255)
             if couleur:
                 surface.set_at((start_x + j, start_y + i), couleur)
@@ -56,8 +55,8 @@ def draw_cell(surface: pygame.Surface, col: int, ligne: int,
 
 def draw_maze(maze: list[list[int]]) -> pygame.Surface:
     """Builds the full maze as one static Surface (drawn once)."""
-    height = len(maze) * TAILLE_CASE
-    width = len(maze[0]) * TAILLE_CASE
+    height = len(maze) * CELL_SIZE
+    width = len(maze[0]) * CELL_SIZE
     surface = pygame.Surface((width, height))
 
     for i, row in enumerate(maze):
