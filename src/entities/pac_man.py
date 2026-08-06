@@ -47,7 +47,7 @@ class PacMan(Entity):
                  hp: int = 1, targetable: bool = True) -> None:
         super().__init__(pos_x=pos_x, pos_y=pos_y, hp=hp,
                          targetable=targetable, maze_infos=maze_infos,
-                         speed=2, player=True)
+                         speed=2.0, player=True)
         self.score = 0
         self.god_mod = False
         self.eats_everything = False

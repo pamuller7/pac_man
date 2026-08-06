@@ -15,7 +15,7 @@ class Ghost(Entity):
 
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
                  maze_infos: Tuple[int, int], hp: int = 1,
-                 targetable: bool = False, speed: int = 1) -> None:
+                 targetable: bool = False, speed: float = 1) -> None:
         super().__init__(pos_x, pos_y, hp, targetable, maze_infos,
                          speed, player=False)
         self.target_tile = (0, 0)
@@ -43,8 +43,7 @@ class Ghost(Entity):
         """
         pass
 
-    def find_target_tile(self, avb_cells: List[tuple[int, int]],
-                         maze: List[List[int]]) -> None:
+    def find_target_tile(self, avb_cells: List[tuple[int, int]]) -> None:
         """
             calls the right function depending on the ghost's
             and pacman's state
@@ -64,11 +63,11 @@ class Ghost(Entity):
         else:
             self.go_to_corner(1)
 
-    def set_speed(self, amount: int) -> None:
+    def set_speed(self, amount: float) -> None:
         if not self.freeze:
             self.speed = amount
         else:
-            self.speed = 0
+            self.speed = 0.0
 
     def update_entity(self, frame_count: int) -> None:
         if (
@@ -85,7 +84,7 @@ class Ghost(Entity):
             self.set_speed(self.speed_init)
         elif self.targetable:
             self.sprite = self.assets['swich'][self.tick]
-            self.set_speed(int(self.speed_init/2))
+            self.set_speed(self.speed_init/2)
         else:
             self.sprite = self.assets[self.facing][self.tick]
             self.set_speed(self.speed_init)
@@ -168,7 +167,7 @@ class Ghost(Entity):
 
 class RedGhost(Ghost):
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
-                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
+                 maze_infos: Tuple[int, int], speed: float = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -194,7 +193,7 @@ class RedGhost(Ghost):
 
 class BlueGhost(Ghost):
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
-                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
+                 maze_infos: Tuple[int, int], speed: float = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -232,7 +231,7 @@ class BlueGhost(Ghost):
 
 class OrangeGhost(Ghost):
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
-                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
+                 maze_infos: Tuple[int, int], speed: float = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,
@@ -270,7 +269,7 @@ class OrangeGhost(Ghost):
 
 class PurpuleGhost(Ghost):
     def __init__(self, pos_x: int, pos_y: int, pac_man_pos: Pos,
-                 maze_infos: Tuple[int, int], speed: int = 2) -> None:
+                 maze_infos: Tuple[int, int], speed: float = 2) -> None:
         super().__init__(pos_x=pos_x,
                          pos_y=pos_y,
                          pac_man_pos=pac_man_pos,

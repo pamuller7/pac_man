@@ -168,13 +168,17 @@ class Engine:
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
-                                self.pacman.pos, maze_infos=maze_infos),
+                                self.pacman.pos, maze_infos=maze_infos,
+                                speed=self.pacman.speed - 0.1),
                        BlueGhost(blue_pos[0], blue_pos[1],
-                                 self.pacman.pos, maze_infos=maze_infos),
+                                 self.pacman.pos, maze_infos=maze_infos,
+                                 speed=self.pacman.speed - 0.1),
                        OrangeGhost(orange_pos[0], orange_pos[1],
-                                   self.pacman.pos, maze_infos=maze_infos),
+                                   self.pacman.pos, maze_infos=maze_infos,
+                                   speed=self.pacman.speed - 0.1),
                        PurpuleGhost(pink_pos[0], pink_pos[1],
-                                    self.pacman.pos, maze_infos=maze_infos)]
+                                    self.pacman.pos, maze_infos=maze_infos,
+                                    speed=self.pacman.speed - 0.1)]
         Entity.entities.append(self.pacman)
         for ghost in self.ghosts:
             ghost.score = self.config.points_per_ghost
@@ -366,7 +370,7 @@ class Engine:
                 and entity.can_move(self.maze, self.buffered_dir)):
             entity.facing = self.buffered_dir
         elif not entity.player:
-            entity.find_target_tile(self.corners + self.others, self.maze)
+            entity.find_target_tile(self.corners + self.others)
             entity.find_short_path(self.maze, entity.target_tile)
             if entity.shortest_path:
                 entity.facing = entity.shortest_path[0]

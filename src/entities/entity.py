@@ -18,7 +18,7 @@ class Entity:
 
     def __init__(self, pos_x: int, pos_y: int, hp: int,
                  targetable: bool, maze_infos: Tuple[int, int],
-                 speed: int = 2, player: bool = False,
+                 speed: float = 2.0, player: bool = False,
                  facing: str = "N") -> None:
         """Initializes a new entity and registers it globally.
         pos_x, pos_y: pos of the created item
@@ -72,19 +72,19 @@ class Entity:
         return (self.pos.x, self.pos.y)
 
     def moove_up(self) -> None:
-        """Moves the entity up by its speed."""
+        """Moves the entity up"""
         self.pos.up(1)
 
     def moove_down(self) -> None:
-        """Moves the entity down by its speed."""
+        """Moves the entity down"""
         self.pos.down(1)
 
     def moove_left(self) -> None:
-        """Moves the entity left by its speed."""
+        """Moves the entity left"""
         self.pos.left(1)
 
     def moove_right(self) -> None:
-        """Moves the entity right by its speed."""
+        """Moves the entity right"""
         self.pos.right(1)
 
     def can_move(self, maze: List[List[int]], direction: str) -> bool:
@@ -161,8 +161,7 @@ class Entity:
         """
         pass
 
-    def find_target_tile(self, avb_cells: List[Tuple[int, int]],
-                         maze: List[List[int]]) -> None:
+    def find_target_tile(self, avb_cells: List[Tuple[int, int]]) -> None:
         """Chooses the cell the entity walks toward.
 
         Only the entities driven by the game (the ghosts) override it;
