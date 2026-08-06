@@ -57,8 +57,8 @@ class Level(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    width: int = 15
-    height: int = 15
+    width: int = 20
+    height: int = 20
     seed: int = 42
 
     @model_validator(mode="before")
@@ -68,13 +68,13 @@ class Level(BaseModel):
             return data
         data = data.copy()
 
-        width = get_int(data, "width", 15)
+        width = get_int(data, "width", 20)
         data["width"] = max(15, min(width, 60))
         if data["width"] != width:
             print(f"Warning for 'width': {width} not between 15 and 60. \
 'width' set to {data['width']}")
 
-        height = get_int(data, "height", 15)
+        height = get_int(data, "height", 20)
         data["height"] = max(15, min(height, 30))
         if data["height"] != height:
             print(f"Warning for 'height': {height} not between 15 and 60.\
