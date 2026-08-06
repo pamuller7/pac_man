@@ -151,7 +151,8 @@ def main(argv: List[str]) -> int:
         config = load_config(argv[1])
     except PacManError as exc:
         print(f"pac-man: {exc}", file=sys.stderr)
-        return 1
+        print("Default values will be used - cf README.md, config section")
+        config = Config()
     try:
         pygame.init()
         game_loop(config)
