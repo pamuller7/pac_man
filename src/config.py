@@ -94,7 +94,7 @@ class Config(BaseModel):
 
     highscore_filename: str = "data/scores.json"
     lives: int = 3
-    level_max_time: int = 90
+    level_max_time: int = 120
     pacgum: int = -1
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 50
@@ -124,11 +124,11 @@ set to '{data['highscore_filename']}'")
             print(f"\033[33m[Warning]\033[0m 'lives': {lives} < 0. \
 'lives' set to {data['lives']}")
 
-        level_max_time = get_int(data, "level_max_time", 90)
-        data["level_max_time"] = level_max_time if level_max_time >= 1 else 90
+        level_max_time = get_int(data, "level_max_time", 120)
+        data["level_max_time"] = level_max_time if level_max_time >= 1 else 120
         if data["level_max_time"] != level_max_time:
-            print(f"\033[33m[Warning]\033[0m 'level_max_time': {level_max_time} < 1. \
-'level_max_time' set to {data['level_max_time']}")
+            print(f"\033[33m[Warning]\033[0m 'level_max_time':\
+ {level_max_time} < 1. 'level_max_time' set to {data['level_max_time']}")
 
         pacgum = get_int(data, "pacgum", -1)
         data["pacgum"] = pacgum if pacgum >= 1 else -1
