@@ -197,7 +197,7 @@ def format_errors(exc: ValidationError) -> str:
     return "\n".join(lines)
 
 
-def load_config(path: str) -> Config:
+def load_config(relative_path: str) -> Config:
     """Reads `path` and returns the validated configuration.
 
     Raises:
@@ -205,7 +205,7 @@ def load_config(path: str) -> Config:
             or holds a value the game cannot use. The message always says
             which key is wrong.
     """
-    path = resource_path(path)
+    path = resource_path(relative_path)
     try:
         with open(path, encoding="utf-8") as file:
             raw = file.read()

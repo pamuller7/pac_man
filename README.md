@@ -10,6 +10,14 @@ tation, articles, tutorials, etc.), as well as a description of how AI was used 
 specifying for which tasks and which parts of the project.
 
 
+executable creation:
+
+uv run pyinstaller \                                                                                                    
+  --windowed \
+  --add-data "assets:assets" \
+  --add-data "config.json:." \
+  --add-data "src/:src/" \
+  pac-man.py
 
 # Pac Man
 

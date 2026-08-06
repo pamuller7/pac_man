@@ -5,14 +5,14 @@ import os
 from src.error import AssetNotFoundError, AssetError
 
 
-def load_sprite(path: str, screen: pygame.Surface) -> pygame.Surface:
+def load_sprite(relative_path: str, screen: pygame.Surface) -> pygame.Surface:
     """Loads and scales a sprite to one cell.
 
     Raises:
         AssetNotFoundError: if the file does not exist.
         AssetError: if pygame fails to decode it.
     """
-    path = resource_path(path)
+    path = resource_path(relative_path)
     if not os.path.exists(path):
         raise AssetNotFoundError(path)
     try:
