@@ -92,7 +92,6 @@ found in 'corrupted_scores.txt'")
         tmp_path = f"{self.path}.tmp"
         with open(tmp_path, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=2)
-        print(data)
         os.replace(tmp_path, self.path)
 
     def get_player(self, name: str) -> Player:
