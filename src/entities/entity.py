@@ -241,13 +241,22 @@ class Entity:
         return math.sqrt((x_o - x_t) ** 2 + (y_o - y_t) ** 2)
 
     @classmethod
+    def collide(cls, entity1: "Entity", entity2: "Entity") -> bool:
+        if (
+            abs(entity1.render_x - entity2.render_x) < TAILLE_CASE//2
+            and abs(entity1.render_y - entity2.render_y) < TAILLE_CASE//2
+        ):
+            return (True)
+        return (False)
+
+    @classmethod
     def check_eaten(cls) -> None:
         """Resolves every collision between two entities on the same cell."""
         for entity1 in cls.entities:
             for entity2 in cls.entities:
                 if entity1 == entity2:
                     continue
-                if (entity1.pos.get_pos() == entity2.pos.get_pos()):
+                if (cls.collide(entity1, entity2)):
                     entity1.is_eaten(entity2)
                     if not entity2.player and entity1.player:
                         entity2.normal_behaviour = False
