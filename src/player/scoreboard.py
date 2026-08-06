@@ -46,23 +46,25 @@ class Scoreboard:
                            for name, score in data["scores"]]
         except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
             error = ScoreboardCorruptedError(self.path, str(exc))
-            print(error)
+            print("\033[33m[Warning]\033[0m", error)
             reinit = 't'
             while reinit != 'y' and reinit != 'n':
                 reinit = input(f"Do you want to save the current content \
 of {self.path} in 'corrupted_scores.txt' and \
 reinitialize {self.path} ? (y/n): ")
-            if reinit == 'y':
+                reinit = reinit.strip()
+            if reinit.strip() == 'y':
                 print("Reinitialising the file")
                 with open(self.path, "r") as file:
                     corrupted_data = file.read()
-                print("corrupted data can be found in 'corrupted_scores.txt'")
                 with open("corrupted_scores.txt", "w") as file:
                     file.write(corrupted_data)
                 with open(self.path, "w", encoding="utf-8") as file:
                     new_data = {"players": [],
                                 "scores": []}
                     json.dump(new_data, file)
+                print("\033[32m[Resolved]\033[0m corrupted data can be \
+found in 'corrupted_scores.txt'")
             else:
                 raise error from exc
 

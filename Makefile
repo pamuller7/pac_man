@@ -24,7 +24,9 @@ debug:
 clean:
 	@echo "cleaning..."
 	@rm -rf *__pycache__/ src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data .mypy_cache
-	@rm -rf $(INSTALLED)
+	@rm -rf corrupted_scores.txt
+
+clean-all: clean
 	@rm -rf .venv
 
 lint:
@@ -39,4 +41,4 @@ lint-strict:
 	uv run mypy . --strict --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 
-.PHONY: install run debug clean lint lint-strict
+.PHONY: install run debug clean lint lint-strict clean-all

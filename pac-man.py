@@ -162,10 +162,11 @@ def main(argv: List[str]) -> int:
         pygame.init()
         game_loop(config)
     except PacManError as exc:
-        print(f"pac-man: {exc}", file=sys.stderr)
+        print(f"\033[31m[Error]\033[0m pac-man: {exc}", file=sys.stderr)
         return 1
     except pygame.error as exc:
-        print(f"pac-man: display error: {exc}", file=sys.stderr)
+        print(f"\033[31m[Error]\033[0m pac-man: display error: {exc}",
+              file=sys.stderr)
         return 1
     finally:
         pygame.quit()
