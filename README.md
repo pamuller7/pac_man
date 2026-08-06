@@ -54,7 +54,6 @@ eg of a configuration file:
     "highscore_filename": "data/scores.json",
     "lives":3, -> can not be < 1
     
-    "pacgum": -1, -> -1 default, so if not definied, we caluculate it to fill 80% of the maze
     "points_per_pacgum": 10, -> can not be < 0
     "points_per_super_pacgum": 50, -> can not be < 0
     "points_per_ghost": 200, -> can not be < 0
@@ -64,7 +63,8 @@ eg of a configuration file:
         { 
 		  "width": 15, -> can only be in [15, 60]
 		  "height": 15, -> can only be in [15, 60]
-		  "seed": 42 -> can not be < 0
+		  "seed": 42, -> can not be < 0
+      "pacgum": -1, -> -1 default, so if not definied or invalid, we calculate it to fill 80% of the maze
 		}
     ]
 }

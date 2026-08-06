@@ -163,7 +163,7 @@ class Engine:
         self.buffered_dir: str | None = None
         self.skip_level = False
 
-        self.spawn_pacgums(maze, self.config.pacgum)
+        self.spawn_pacgums(maze, self.level.pacgum)
 
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)

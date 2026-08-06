@@ -61,6 +61,7 @@ class Level(BaseModel):
     width: int = 20
     height: int = 20
     seed: int = 42
+    pacgum: int = -1
 
     @model_validator(mode="before")
     @classmethod
@@ -86,6 +87,13 @@ not between 15 and 60. 'height' set to {data['height']}")
         if data["seed"] != seed:
             print(f"\033[33m[Warning]\033[0m 'seed': {seed} < 0. \
 'seed' set to {data['seed']}")
+
+        heighty_percent = int(80 * data["width"] * data["height"] / 100)
+        pacgum = get_int(data, "pacgum", heighty_percent)
+        data["pacgum"] = pacgum if pacgum >= 1 else heighty_percent
+        if data["pacgum"] != pacgum:
+            print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1. \
+'pacgum' set to {data["pacgum"]} (80% of the maze)")
         return data
 
 
@@ -96,7 +104,6 @@ class Config(BaseModel):
     highscore_filename: str = "data/scores.json"
     lives: int = 3
     level_max_time: int = 120
-    pacgum: int = -1
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 50
     points_per_ghost: int = 200
@@ -130,12 +137,6 @@ set to '{data['highscore_filename']}'")
         if data["level_max_time"] != level_max_time:
             print(f"\033[33m[Warning]\033[0m 'level_max_time':\
  {level_max_time} < 1. 'level_max_time' set to {data['level_max_time']}")
-
-        pacgum = get_int(data, "pacgum", -1)
-        data["pacgum"] = pacgum if pacgum >= 1 else -1
-        if data["pacgum"] != pacgum:
-            print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1. \
-'pacgum' set to {data['pacgum']}")
 
         points_per_pacgum = get_int(data, "points_per_pacgum", 10)
         data["points_per_pacgum"] = (points_per_pacgum

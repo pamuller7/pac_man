@@ -88,12 +88,8 @@ def play_run(screen: pygame.Surface,
     level_number = 0
     max_width = max(var.width for var in config.levels)
     max_height = max(var.height for var in config.levels)
-    old_nb_pacgum = config.pacgum
     while level_number < config.max_nb_level:
-        config.pacgum = old_nb_pacgum
         level = config.levels[level_number]
-        if config.pacgum < 1:
-            config.pacgum = int(80 * level.width * level.height / 100)
         level_number += 1
         maze = new_maze(level)
         spawn_col, spawn_row = find_spawn(maze)
