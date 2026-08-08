@@ -31,6 +31,14 @@ class MalformedMazeError(MazeError):
         self.row = row
 
 
+class Invalidwindow(MazeError):
+    """Raised when the window size is invalid."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            f"Window size is invalid."
+        )
+
 class InvalidCellError(MazeError):
     """
     Raised when a maze cell holds a value outside the 0..15 bitmask range.

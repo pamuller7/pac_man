@@ -13,7 +13,7 @@ from time import time
 from typing import List, Tuple
 import pygame
 from src.entities import PacMan
-from src.error import NoSpawnError
+from src.error import Invalidwindow, NoSpawnError
 from mazegenerator import MazeGenerator
 from src.config import Config, Level, load_config
 from src.engine import Engine
@@ -172,5 +172,5 @@ def main(argv: List[str]) -> int:
 if __name__ == "__main__":
     try:
         main(sys.argv)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, Invalidwindow):
         print("goodbye!!!!")

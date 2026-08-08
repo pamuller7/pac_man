@@ -19,8 +19,9 @@ debug:
 
 clean:
 	@echo "cleaning..."
-	@rm -rf *__pycache__/ src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data .mypy_cache
+	@rm -rf *__pycache__/ src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data .mypy_cache pac-man.spec
 	@rm -rf corrupted_scores.txt
+	@rm -rf dist build
 
 clean-all: clean
 	@rm -rf .venv

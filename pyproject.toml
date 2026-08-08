@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2",
     "mypy==2.3.0",
     "mazegenerator",
+    "pyinstaller"
 ]
 
 [tool.mypy]

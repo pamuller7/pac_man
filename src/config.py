@@ -10,6 +10,7 @@ program must be able to fail cleanly) before any window is opened.
 """
 
 import json
+import pygame
 import re
 
 from path import resource_path
@@ -21,7 +22,7 @@ from pydantic import (
     ValidationError,
     model_validator)
 
-from .error import PacManError
+from .error import PacManError, Invalidwindow
 
 COMMENT_RE = re.compile(r"#|//|;")
 
@@ -69,16 +70,18 @@ class Level(BaseModel):
         if not isinstance(data, dict):
             return data
         data = data.copy()
-
+        pygame.init()
+        info = pygame.display.Info()
+        screen_width_m = info.current_w
+        screen_height_m = info.current_h
         width = get_int(data, "width", 20)
         data["width"] = max(15, min(width, 60))
-        if data["width"] != width:
+        if data["width"] != width or data["width"] >= screen_width_m:
             print(f"\033[33m[Warning]\033[0m 'width': {width} \
 not between 15 and 60. 'width' set to {data['width']}")
-
         height = get_int(data, "height", 20)
         data["height"] = max(15, min(height, 30))
-        if data["height"] != height:
+        if data["height"] != height or data["height"] >= screen_height_m:
             print(f"\033[33m[Warning]\033[0m 'height': {height} \
 not between 15 and 60. 'height' set to {data['height']}")
 
