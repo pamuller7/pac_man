@@ -53,6 +53,7 @@ def find_spawn(maze: List[List[int]]) -> Tuple[int, int]:
 
 def new_maze(level: Level) -> List[List[int]]:
     """Generates a fresh maze of the size asked by `level`."""
+    print(level.seed)
     maze: List[List[int]] = MazeGenerator(
         size=(level.width, level.height),
         seed=level.seed).maze
@@ -83,6 +84,7 @@ def play_run(screen: pygame.Surface,
     Returns (won, total score, window), the window being returned because
     it is rebuilt whenever a level has a different size.
     """
+    rng = random.Random()
     total = 0
     pacman = PacMan(0, 0,
                     maze_infos=(0, 0),
@@ -116,9 +118,9 @@ def play_run(screen: pygame.Surface,
             return False, total, screen
         if level_number == len(config.levels):
             new_level = Level(
-                width=random.randint(15, max_width),
-                height=random.randint(15, max_height),
-                seed=random.randint(SEED_MIN, SEED_MAX),
+                width=rng.randint(15, max_width),
+                height=rng.randint(15, max_height),
+                seed=rng.randint(SEED_MIN, SEED_MAX),
             )
             config.levels.append(new_level)
     return True, total, screen

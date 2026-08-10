@@ -8,8 +8,9 @@ import json
 import os
 from typing import Any
 
-from ..error import ScoreboardCorruptedError
+from src.error import ScoreboardCorruptedError
 from .player import Player
+from path import resource_path
 
 DEFAULT_PATH = "data/scores.json"
 
@@ -21,7 +22,7 @@ class Scoreboard:
     """
 
     def __init__(self, path: str = DEFAULT_PATH) -> None:
-        self.path = path
+        self.path = resource_path(path)
         self.players: dict[str, Player] = {}
         # self.scores: list[tuple[str, int]] = []
 

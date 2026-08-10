@@ -9,15 +9,15 @@ from typing import List, Tuple
 
 # from src.entities import entity
 
-from ..entities import (PacMan,
-                        Entity,
-                        RedGhost,
-                        BlueGhost,
-                        OrangeGhost,
-                        PurpuleGhost,
-                        Pacgum)
-from ..config import Config, Level
-from ..error import (
+from src.entities import (PacMan,
+                          Entity,
+                          RedGhost,
+                          BlueGhost,
+                          OrangeGhost,
+                          PurpuleGhost,
+                          Pacgum)
+from src.config import Config, Level
+from src.error import (
     AssetError,
     AssetNotFoundError,
     EmptyMazeError,
@@ -25,11 +25,11 @@ from ..error import (
     MalformedMazeError,
     NoSpawnError,
 )
-from ..renderer import (CELL_SIZE,
-                        HUD_HEIGHT,
-                        draw_maze,
-                        draw_text,
-                        pause_menu)
+from src.renderer import (CELL_SIZE,
+                          HUD_HEIGHT,
+                          draw_maze,
+                          draw_text,
+                          pause_menu)
 
 PAC_SPRITE = "assets/pacman.png"
 GHOST_BLUE_SPRITE = "assets/ghost_blue.png"
@@ -354,7 +354,7 @@ class Engine:
             target_x = entity.pos.x * CELL_SIZE
             target_y = entity.pos.y * CELL_SIZE
             if entity.render_x == target_x and entity.render_y == target_y:
-                self.step(entity)
+                self._step(entity)
                 target_x = entity.pos.x * CELL_SIZE
                 target_y = entity.pos.y * CELL_SIZE
 
@@ -362,7 +362,7 @@ class Engine:
             entity.render_x = slide(entity.render_x, target_x, step)
             entity.render_y = slide(entity.render_y, target_y, step)
 
-    def step(self, entity: Entity) -> None:
+    def _step(self, entity: Entity) -> None:
         """Chooses and applies the next grid move (buffered turn first)."""
 
         if (entity.player

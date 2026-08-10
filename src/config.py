@@ -13,7 +13,7 @@ import json
 import pygame
 import random
 import re
-
+from src.renderer.display import CELL_SIZE
 from typing import Any
 from pydantic import (
     BaseModel,
@@ -137,23 +137,17 @@ class Level(BaseModel):
         info = pygame.display.Info()
         screen_width_m = info.current_w
         screen_height_m = info.current_h
-        check_int(data, "width", 20, 15, 60, clamp=True)
-        check_int(data, "height", 20, 15, 30, clamp=True)
+        print(screen_height_m, screen_width_m)
+        check_int(data, "width", 20, 15,
+                  screen_width_m//CELL_SIZE - 4, clamp=True)
+        check_int(data, "height", 20, 15,
+                  screen_height_m//CELL_SIZE - 4, clamp=True)
         nb_pacgum = data["width"] * data["height"]
         pacgum = get_int(data, "pacgum", nb_pacgum)
         data["pacgum"] = pacgum if pacgum >= 1 else nb_pacgum
         if data["pacgum"] != pacgum:
             print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1 \
 defaul behevior(100% of the maze)")
-        if data["width"] >= screen_width_m:
-            print(f"\033[33m[Warning]\033[0m 'width': {data['width']} "
-                  f"wider than the screen ({screen_width_m})")
-        if data["height"] >= screen_height_m:
-            print(f"\033[33m[Warning]\033[0m 'height': {data['height']} "
-                  f"higher than the screen ({screen_height_m})")
-        if "seed" in data:
-            check_int(data, "seed", random_seed(), SEED_MIN,
-                      note=" (drawn at random)")
         return data
 
 # ------------------------------------------------------------#
@@ -240,7 +234,7 @@ def load_config(path: str) -> Config:
         for key, value in pairs:
             if key in seen:
                 print(f"\033[33m[Warning]\033[0m \
-Duplicate key {key} detected, {key}: {value} ignored")
+Duplicate key '{key}' detected, '{key}': {value} ignored")
             else:
                 seen.add(key)
                 result[key] = value
