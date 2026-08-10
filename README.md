@@ -50,7 +50,7 @@ eg of a configuration file:
 		  "width": 15, -> can only be in [15, 60]
 		  "height": 15, -> can only be in [15, 60]
 		  "seed": 1000000, -> can not be < 1000000, drawn at random if missing or invalid
-      "pacgum": x, -> x int > 0, if not defined or invalid, we calculate it to fill 100% of the maze
+          "pacgum": x, -> x int > 0, if not defined or invalid, we calculate it to fill 100% of the maze
 		}
     ]
 }
@@ -210,9 +210,12 @@ The HighscoreManager is responsible for loading and saving persistent scores ind
 ### Project Management
 Organisation was made using kanban, from github projects.
 It helped us to brainstorm and store new features, and pick one when someone is available.
-we mainly discussed with discord.
+we mainly used discord for update and discussion.
 
 ![alt text](organisation/kanban.png)
+
+link for the kanban section:
+https://github.com/users/pamuller7/projects/2
 
 ## Resources
 

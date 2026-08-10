@@ -26,7 +26,7 @@ from .error import PacManError
 
 COMMENT_RE = re.compile(r"#|//|;")
 
-SEED_MIN = 1000000
+SEED_MIN = 1
 SEED_MAX = 9999999
 
 

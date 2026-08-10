@@ -10,11 +10,14 @@ Python traceback, and exits with EXIT_FAILURE.
 import sys
 from time import time
 from typing import List, Tuple
+import random
 import pygame
 from src.entities import PacMan
 from src.error import Invalidwindow, NoSpawnError
 from mazegenerator import MazeGenerator
-from src.config import Config, Level, load_config
+from src.config import (Config, Level,
+                        load_config,
+                        SEED_MIN, SEED_MAX)
 from src.engine import Engine
 from src.error import PacManError
 from src.player import Scoreboard
@@ -77,9 +80,6 @@ def play_run(screen: pygame.Surface,
              ) -> Tuple[bool, int, pygame.Surface]:
     """Plays the levels in order until one is lost or all are cleared.
 
-    Only the levels of the configuration file are played, at most
-    'max_nb_level' of them: the run never invents levels of its own.
-
     Returns (won, total score, window), the window being returned because
     it is rebuilt whenever a level has a different size.
     """
@@ -90,9 +90,10 @@ def play_run(screen: pygame.Surface,
     level_number = 0
     max_width = max(var.width for var in config.levels)
     max_height = max(var.height for var in config.levels)
-    nb_levels = min(len(config.levels), config.max_nb_level)
-    while level_number < nb_levels:
+    while level_number < config.max_nb_level:
         level = config.levels[level_number]
+        if level_number == 0:
+            level.seed = 42
         level_number += 1
         maze = new_maze(level)
         spawn_col, spawn_row = find_spawn(maze)
@@ -113,6 +114,13 @@ def play_run(screen: pygame.Surface,
         total = pacman.score
         if not won:
             return False, total, screen
+        if level_number == len(config.levels):
+            new_level = Level(
+                width=random.randint(15, max_width),
+                height=random.randint(15, max_height),
+                seed=random.randint(SEED_MIN, SEED_MAX),
+            )
+            config.levels.append(new_level)
     return True, total, screen
 
 
