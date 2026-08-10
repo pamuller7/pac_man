@@ -210,6 +210,7 @@ The HighscoreManager is responsible for loading and saving persistent scores ind
 ### Project Management
 Organisation was made using kanban, from github projects.
 It helped us to brainstorm and store new features, and pick one when someone is available.
+we mainly discussed with discord.
 
 ![alt text](organisation/kanban.png)
 
