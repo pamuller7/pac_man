@@ -67,6 +67,46 @@ class DuplicateConfigKeyError(ConfigError):
         self.key = key
 
 
+def check_int(
+    data: dict[str, Any],
+    key: str,
+    default: int,
+    minimum: int | None = None,
+    maximum: int | None = None,
+    *,
+    clamp: bool = False,
+    note: str = "",
+) -> None:
+    """Lit `key` comme un int, le remet dans les bornes, prévient si besoin.
+
+    Hors bornes, la valeur retombe sur `default`, ou sur la borne franchie
+    si `clamp`. `note` est ajouté en fin d'avertissement.
+    """
+    value = get_int(data, key, default)
+    too_low = minimum is not None and value < minimum
+    too_high = maximum is not None and value > maximum
+    if too_low:
+        new_value = minimum if clamp else default
+    elif too_high:
+        new_value = maximum if clamp else default
+    else:
+        new_value = value
+    data[key] = new_value
+    if new_value != value:
+        bound = f"< {minimum}" if too_low else f"> {maximum}"
+        print(f"\033[33m[Warning]\033[0m '{key}': {value} {bound}. "
+              f"'{key}' set to {new_value}{note}")
+
+
+def check_str(data: dict[str, Any], key: str, default: str) -> None:
+    value = data.get(key, default)
+    if not isinstance(value, str):
+        print(f"\033[33m[Warning]\033[0m '{key}': '{value}' not a str. "
+              f"'{key}' set to '{default}'")
+        value = default
+    data[key] = value
+
+
 class Level(BaseModel):
     """One playable level of the game."""
 
@@ -90,23 +130,17 @@ this one is ignored")
         info = pygame.display.Info()
         screen_width_m = info.current_w
         screen_height_m = info.current_h
-        width = get_int(data, "width", 20)
-        data["width"] = max(15, min(width, 60))
-        if data["width"] != width or data["width"] >= screen_width_m:
-            print(f"\033[33m[Warning]\033[0m 'width': {width} \
-not between 15 and 60. 'width' set to {data['width']}")
-        height = get_int(data, "height", 20)
-        data["height"] = max(15, min(height, 30))
-        if data["height"] != height or data["height"] >= screen_height_m:
-            print(f"\033[33m[Warning]\033[0m 'height': {height} \
-not between 15 and 60. 'height' set to {data['height']}")
-
+        check_int(data, "width", 20, 15, 60, clamp=True)
+        check_int(data, "height", 20, 15, 30, clamp=True)
+        if data["width"] >= screen_width_m:
+            print(f"\033[33m[Warning]\033[0m 'width': {data['width']} "
+                  f"wider than the screen ({screen_width_m})")
+        if data["height"] >= screen_height_m:
+            print(f"\033[33m[Warning]\033[0m 'height': {data['height']} "
+                  f"higher than the screen ({screen_height_m})")
         if "seed" in data:
-            seed = get_int(data, "seed", 0)
-            data["seed"] = seed if seed >= SEED_MIN else random_seed()
-            if data["seed"] != seed:
-                print(f"\033[33m[Warning]\033[0m 'seed': {seed} \
-< {SEED_MIN}. 'seed' set to {data['seed']} (drawn at random)")
+            check_int(data, "seed", random_seed(), SEED_MIN,
+                      note=" (drawn at random)")
         return data
 
 
@@ -130,66 +164,14 @@ class Config(BaseModel):
         if not isinstance(data, dict):
             return data
         data = data.copy()
-        highscore_filename = data.get("highscore_filename", "data/scores.json")
-        data["highscore_filename"] = (
-            highscore_filename if isinstance(highscore_filename, str)
-            else "data/scores.json"
-            )
-        if highscore_filename != data["highscore_filename"]:
-            print(f"\033[33m[Warning]\033[0m 'highscore_filename': \
-'{highscore_filename}' not a str. 'highscore_filename' \
-set to '{data['highscore_filename']}'")
-
-        pacgum = get_int(data, "pacgum", -1)
-        data["pacgum"] = pacgum if pacgum >= 1 else -1
-        if data["pacgum"] != pacgum:
-            print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1. \
-'pacgum' set to {data['pacgum']} (80% of the maze)")
-
-        lives = get_int(data, "lives", 3)
-        data["lives"] = lives if lives > 0 else 3
-        if data["lives"] != lives:
-            print(f"\033[33m[Warning]\033[0m 'lives': {lives} < 0. \
-'lives' set to {data['lives']}")
-
-        level_max_time = get_int(data, "level_max_time", 120)
-        data["level_max_time"] = level_max_time if level_max_time >= 1 else 120
-        if data["level_max_time"] != level_max_time:
-            print(f"\033[33m[Warning]\033[0m 'level_max_time':\
- {level_max_time} < 1. 'level_max_time' set to {data['level_max_time']}")
-
-        points_per_pacgum = get_int(data, "points_per_pacgum", 10)
-        data["points_per_pacgum"] = (points_per_pacgum
-                                     if points_per_pacgum >= 0 else 10)
-        if data["points_per_pacgum"] != points_per_pacgum:
-            print(f"\033[33m[Warning]\033[0m 'points_per_pacgum': \
-{points_per_pacgum} < 0. 'points_per_pacgum' set \
-to {data['points_per_pacgum']}")
-
-        points_per_super_pacgum = get_int(data, "points_per_super_pacgum", 50)
-        data["points_per_super_pacgum"] = (
-            points_per_super_pacgum if points_per_super_pacgum >= 0 else 50
-        )
-        if data["points_per_super_pacgum"] != points_per_super_pacgum:
-            print(f"\033[33m[Warning]\033[0m 'points_per_super_pacgum': \
-{points_per_super_pacgum} < 0. 'points_per_super_pacgum' set \
-to {data['points_per_super_pacgum']}")
-
-        points_per_ghost = get_int(data, "points_per_ghost", 200)
-        data["points_per_ghost"] = (points_per_ghost
-                                    if points_per_ghost >= 0 else 200)
-        if data["points_per_ghost"] != points_per_ghost:
-            print(f"\033[33m[Warning]\033[0m 'points_per_ghost': \
-{points_per_ghost} < 0. 'points_per_ghost' set \
-to {data['points_per_ghost']}")
-
-        max_nb_level = get_int(data, "max_nb_level", 10)
-        data["max_nb_level"] = max_nb_level if max_nb_level >= 1 else 10
-        if data["max_nb_level"] != max_nb_level:
-            print(f"\033[33m[Warning]\033[0m 'max_nb_level': \
-{max_nb_level} < 0. 'max_nb_level' set \
-to {data['max_nb_level']}")
-
+        check_str(data, "highscore_filename", "data/scores.json")
+        check_int(data, "pacgum", -1, minimum=1, note=" (80% of the maze)")
+        check_int(data, "lives", 3, minimum=1)
+        check_int(data, "level_max_time", 120, minimum=1)
+        check_int(data, "points_per_pacgum", 10, minimum=0)
+        check_int(data, "points_per_super_pacgum", 50, minimum=0)
+        check_int(data, "points_per_ghost", 200, minimum=0)
+        check_int(data, "max_nb_level", 10, minimum=1)
         if not data.get("levels"):
             data["levels"] = [Level(width=20, height=20)]
         return data
@@ -247,6 +229,7 @@ def load_config(relative_path: str) -> Config:
     try:
         data = json.loads(
             strip_comments(raw), object_pairs_hook=reject_duplicates)
+        # print(data)
     except json.JSONDecodeError as exc:
         raise ConfigError(
             f"{path}:{exc.lineno}: invalid JSON: {exc.msg}.") from exc
