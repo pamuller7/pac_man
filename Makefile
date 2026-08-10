@@ -20,7 +20,6 @@ build:
 	uv run pyinstaller \
 	--windowed \
   	--add-data "assets:assets" \
-  	--add-data "config.json:." \
   	--add-data "src/:src/" \
   	pac-man.py
 

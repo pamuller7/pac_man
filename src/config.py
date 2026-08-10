@@ -14,7 +14,6 @@ import pygame
 import random
 import re
 
-from path import resource_path
 from typing import Any
 from pydantic import (
     BaseModel,
@@ -220,7 +219,7 @@ def format_errors(exc: ValidationError) -> str:
 
 # ------------------------------------------------------------#
 
-def load_config(relative_path: str) -> Config:
+def load_config(path: str) -> Config:
     """Reads `path` and returns the validated configuration.
 
     Raises:
@@ -228,7 +227,6 @@ def load_config(relative_path: str) -> Config:
             or holds a value the game cannot use. The message always says
             which key is wrong.
     """
-    path = resource_path(relative_path)
     try:
         with open(path, encoding="utf-8") as file:
             raw = file.read()

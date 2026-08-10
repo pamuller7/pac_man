@@ -1,24 +1,5 @@
 *this project has been created as part of the 42 curriculum by pamuller, mobenais.*
 
-
-• A “Description” section that clearly presents the project, including its goal and a
-brief overview.
-• An “Instructions” section containing any relevant information about compilation,
-installation, and/or execution.
-• A “Resources” section listing classic references related to the topic (documen-
-tation, articles, tutorials, etc.), as well as a description of how AI was used —
-specifying for which tasks and which parts of the project.
-
-
-executable creation:
-
-uv run pyinstaller \                                                                                                    
-  --windowed \
-  --add-data "assets:assets" \
-  --add-data "config.json:." \
-  --add-data "src/:src/" \
-  pac-man.py
-
 # Pac Man
 
 ## Description
@@ -27,6 +8,12 @@ Recreate the famous arcade game Pac-Man with a modern Python codebase,
 a clean project structure, and a deployable build.
 to be enought accurate to the subject we use all py game function that appear in wrapper 
 python of mlx 42
+
+Contributions:
+| contributor| Implemented| Fix |
+|:-----:|:-------:|:------:|
+| mobenais| engine.py, config.py, display.py, menu| refacto| 
+| pamuller| entites/, menu (algos)| config.py |  
 
 ## Instructions
 
@@ -53,8 +40,6 @@ eg of a configuration file:
 {
     "highscore_filename": "data/scores.json",
     "lives":3, -> can not be < 1
-    
-    "pacgum": -1, -> -1 default, so if not defined or invalid, we calculate it to fill 80% of the maze
     "points_per_pacgum": 10, -> can not be < 0
     "points_per_super_pacgum": 50, -> can not be < 0
     "points_per_ghost": 200, -> can not be < 0
@@ -65,6 +50,7 @@ eg of a configuration file:
 		  "width": 15, -> can only be in [15, 60]
 		  "height": 15, -> can only be in [15, 60]
 		  "seed": 1000000, -> can not be < 1000000, drawn at random if missing or invalid
+      "pacgum": x, -> x int > 0, if not defined or invalid, we calculate it to fill 100% of the maze
 		}
     ]
 }
@@ -81,11 +67,14 @@ of levels you write is the length of a game. `"max_nb_level"` only caps it:
 with 5 levels and `"max_nb_level": 2`, only the first 2 are played.
 
 ### Highscore
-how the highscore system works and why you decided to implement it this way.
+
+The highsocre system stores a Player class, at the end of a game , it takes the total result, at the end of a game (win or loose), asks for the name and stores it in a json file (data/scores.json).
+If any problem in the json file, asks to rewrite the corrupted one in an other file for archive and correct it with the default format.
+
+If there is 10 scores, a new one will be written only if it's higher than the existing ones.
 
 
 ### Maze Generation
-how the assigned A-Maze-ing package is used to generate mazes.
 The maze package is used in pac-man.py, in the `new_maze()` function.
 We create a new maze object, with the specified size and seed, and returns the maze infos, a list of ints encoding the maze, where each bit of a cell tells if there is a wall or not.
 
@@ -191,9 +180,44 @@ Depending on the type of pacgum:
 
 ### General Software Architecture
 high-level overview of the soft-ware architecture (modules, classes, and their relationships).
+```
+pac-man.py 
+|
+-> config.py
+|
+-> game_loop() <------------------------------------
+|                                                  |
+-> Level                                           |
+|                                                  |
+-> Graphical renderer                              |
+|                                                  |
+-> Engine -> Pac man |                             |
+|         |          | inherit from entiy          |
+|         -> Ghosts  |                             |
+|         |                                        |
+|         -> render_display                        |
+|                                                  |
+-> Scoreboard --------------------------------------
+```
+
+Game is the central component of the application. It manages the game loop and coordinates the Level, pac-man, Ghost and UI components.
+
+Each Level contains a Maze, pacgums and ghosts. The pac-man interacts with the maze and collects pacgums, while Ghost objects move autonomously and interact with the player.
+
+The HighscoreManager is responsible for loading and saving persistent scores independently from the game logic.
 
 
 ### Project Management
-brief overview of how you managed the project and a link to the dedicated project management directory.
+Organisation was made using kanban, from github projects.
+It helped us to brainstorm and store new features, and pick one when someone is available.
+
+![alt text](organisation/kanban.png)
 
 ## Resources
+
+pac man ghosts ia : https://pacman.fandom.com/wiki/Maze_Ghost_AI_Behaviors
+pac man google : pac man on google
+sprites : https://www.spriters-resource.com/arcade/pacman/
+mlx : https://github.com/42school/mlx_CLXV (to look at available funcitions, for pygame)
+pygame : https://www.pygame.org/docs/
+

@@ -369,7 +369,7 @@ class Engine:
                 and self.buffered_dir
                 and entity.can_move(self.maze, self.buffered_dir)):
             entity.facing = self.buffered_dir
-        elif not entity.player:
+        if not entity.player:
             entity.find_target_tile(self.corners + self.others)
             entity.find_short_path(self.maze, entity.target_tile)
             if entity.shortest_path:
@@ -393,10 +393,6 @@ class Engine:
     def _draw(self) -> None:
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.maze_surface, (self.origin_x, self.origin_y))
-        for entity in Entity.entities:
-            self.screen.blit(self.load_sprite(entity.sprite),
-                             (round(self.origin_x + entity.render_x),
-                              round(self.origin_y + entity.render_y)))
         for gums in Pacgum.pacgums.values():
             if not gums.super_pacgum:
                 div = 3
@@ -408,6 +404,10 @@ class Engine:
             y = (self.origin_y + gums.render_y
                  + (CELL_SIZE - sprite.get_height()) // 2)
             self.screen.blit(sprite, (x, y))
+        for entity in Entity.entities:
+            self.screen.blit(self.load_sprite(entity.sprite),
+                             (round(self.origin_x + entity.render_x),
+                              round(self.origin_y + entity.render_y)))
         draw_text(self.screen,
                   f"score: {self.pacman.score}, hp: {self.pacman.hp},\
    {self.config.level_max_time - int(self._get_current_time())}s,\
