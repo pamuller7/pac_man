@@ -163,7 +163,7 @@ class Engine:
         self.buffered_dir: str | None = None
         self.skip_level = False
 
-        self.spawn_pacgums(maze, self.level.pacgum)
+        self.spawn_pacgums(maze, self.pacgum_count(maze))
 
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
@@ -202,6 +202,17 @@ class Engine:
                              and y in (0, len(maze) - 1))
                 (corners if is_corner else others).append((x, y))
         return (corners, others)
+
+    def pacgum_count(self, maze: List[List[int]]) -> int:
+        """How many pacgums this level asks for.
+
+        Only the top-level 'pacgum' key of the configuration decides it,
+        so every level of a run gets the same number. Left out (or -1),
+        the maze is filled at 80% instead.
+        """
+        if self.config.pacgum >= 1:
+            return self.config.pacgum
+        return int(80 * len(maze) * len(maze[0]) / 100)
 
     def spawn_pacgums(self, maze: List[List[int]], count: int) -> None:
         """Spreads at most `count` pacgums over the walkable cells.

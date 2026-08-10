@@ -54,6 +54,7 @@ eg of a configuration file:
     "highscore_filename": "data/scores.json",
     "lives":3, -> can not be < 1
     
+    "pacgum": -1, -> -1 default, so if not defined or invalid, we calculate it to fill 80% of the maze
     "points_per_pacgum": 10, -> can not be < 0
     "points_per_super_pacgum": 50, -> can not be < 0
     "points_per_ghost": 200, -> can not be < 0
@@ -63,8 +64,7 @@ eg of a configuration file:
         { 
 		  "width": 15, -> can only be in [15, 60]
 		  "height": 15, -> can only be in [15, 60]
-		  "seed": 42, -> can not be < 0
-      "pacgum": -1, -> -1 default, so if not definied or invalid, we calculate it to fill 80% of the maze
+		  "seed": 1000000, -> can not be < 1000000, drawn at random if missing or invalid
 		}
     ]
 }
@@ -72,6 +72,13 @@ eg of a configuration file:
 Here, all of those keys are set to their default values.
 You can modify it if you like, or remove some.
 If weird things happends, like "lives": -1, the system fallsback and sets the lives back to their default values.
+
+`"pacgum"` is a top-level key only: it sets the number of pacgums of every
+level of the run. Put inside a level it is ignored, with a warning.
+
+A run plays the levels of `"levels"` in order and stops there, so the number
+of levels you write is the length of a game. `"max_nb_level"` only caps it:
+with 5 levels and `"max_nb_level": 2`, only the first 2 are played.
 
 ### Highscore
 how the highscore system works and why you decided to implement it this way.

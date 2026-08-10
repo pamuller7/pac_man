@@ -11,6 +11,7 @@ program must be able to fail cleanly) before any window is opened.
 
 import json
 import pygame
+import random
 import re
 
 from path import resource_path
@@ -22,9 +23,21 @@ from pydantic import (
     ValidationError,
     model_validator)
 
-from .error import PacManError, Invalidwindow
+from .error import PacManError
 
 COMMENT_RE = re.compile(r"#|//|;")
+
+SEED_MIN = 1000000
+SEED_MAX = 9999999
+
+
+def random_seed() -> int:
+    """Draws a seed the maze generator accepts.
+
+    Used whenever a level comes without a usable 'seed', so two levels
+    of the same size do not end up on the very same maze.
+    """
+    return random.randint(SEED_MIN, SEED_MAX)
 
 
 def get_int(data: dict[str, Any], key: str, default: int) -> int:
@@ -61,8 +74,7 @@ class Level(BaseModel):
 
     width: int = 20
     height: int = 20
-    seed: int = 42
-    pacgum: int = -1
+    seed: int = Field(default_factory=random_seed, ge=SEED_MIN)
 
     @model_validator(mode="before")
     @classmethod
@@ -70,6 +82,10 @@ class Level(BaseModel):
         if not isinstance(data, dict):
             return data
         data = data.copy()
+        if "pacgum" in data:
+            print(f"\033[33m[Warning]\033[0m 'pacgum': \
+{data.pop('pacgum')} set inside a level. 'pacgum' is a top-level key only, \
+this one is ignored")
         pygame.init()
         info = pygame.display.Info()
         screen_width_m = info.current_w
@@ -85,18 +101,12 @@ not between 15 and 60. 'width' set to {data['width']}")
             print(f"\033[33m[Warning]\033[0m 'height': {height} \
 not between 15 and 60. 'height' set to {data['height']}")
 
-        seed = get_int(data, "seed", 42)
-        data["seed"] = seed if seed >= 0 else 42
-        if data["seed"] != seed:
-            print(f"\033[33m[Warning]\033[0m 'seed': {seed} < 0. \
-'seed' set to {data['seed']}")
-
-        heighty_percent = int(80 * data["width"] * data["height"] / 100)
-        pacgum = get_int(data, "pacgum", heighty_percent)
-        data["pacgum"] = pacgum if pacgum >= 1 else heighty_percent
-        if data["pacgum"] != pacgum:
-            print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1. \
-'pacgum' set to {data["pacgum"]} (80% of the maze)")
+        if "seed" in data:
+            seed = get_int(data, "seed", 0)
+            data["seed"] = seed if seed >= SEED_MIN else random_seed()
+            if data["seed"] != seed:
+                print(f"\033[33m[Warning]\033[0m 'seed': {seed} \
+< {SEED_MIN}. 'seed' set to {data['seed']} (drawn at random)")
         return data
 
 
@@ -106,6 +116,7 @@ class Config(BaseModel):
 
     highscore_filename: str = "data/scores.json"
     lives: int = 3
+    pacgum: int = -1
     level_max_time: int = 120
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 50
@@ -128,6 +139,12 @@ class Config(BaseModel):
             print(f"\033[33m[Warning]\033[0m 'highscore_filename': \
 '{highscore_filename}' not a str. 'highscore_filename' \
 set to '{data['highscore_filename']}'")
+
+        pacgum = get_int(data, "pacgum", -1)
+        data["pacgum"] = pacgum if pacgum >= 1 else -1
+        if data["pacgum"] != pacgum:
+            print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1. \
+'pacgum' set to {data['pacgum']} (80% of the maze)")
 
         lives = get_int(data, "lives", 3)
         data["lives"] = lives if lives > 0 else 3
