@@ -23,12 +23,14 @@ build:
 	--add-data "README.md:readme" \
   	--add-data "src/:src/" \
   	pac-man.py
+	cd dist && zip -r ../pacman.zip pac-man
 
 clean:
 	@echo "cleaning..."
 	@rm -rf *__pycache__/ src/__pycache__ src/*/__pycache__/ src/renderer/screen_menu/__pycache__ data .mypy_cache pac-man.spec
 	@rm -rf corrupted_scores.txt
 	@rm -rf dist build
+	@rm -rf pacman.zip
 
 clean-all: clean
 	@rm -rf .venv
