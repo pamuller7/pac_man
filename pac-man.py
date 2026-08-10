@@ -150,7 +150,7 @@ def main(argv: List[str]) -> int:
     except PacManError as exc:
         print(f"\033[33m[Warning]\033[0m pac-man: {exc}", file=sys.stderr)
         print("\033[33m[Warning]\033[0m Default \
-              values will be used - cf README.md, config section")
+ values will be used - cf README.md, config section")
         config = Config()
     try:
         pygame.init()
