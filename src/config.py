@@ -7,9 +7,9 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    ValidationInfo,
     ValidationError,
-    model_validator)
+    model_validator,
+    ValidationInfo)
 
 from .error import PacManError
 
@@ -121,12 +121,11 @@ class Level(BaseModel):
     def fallback(cls, data: Any, info: ValidationInfo) -> Any:
         if not isinstance(data, dict):
             return data
+
         data = data.copy()
         context = info.context or {}
-
-        screen_width = context.get("screen_width", 1280)
-        screen_height = context.get("screen_height", 720)
-
+        screen_width = context.get("screen_width", 1920)
+        screen_height = context.get("screen_height", 1080)
         max_width = screen_width // CELL_SIZE - 4
         max_height = screen_height // CELL_SIZE - 4
         check_int(data, "width", 20, 15, max_width, clamp=True)
