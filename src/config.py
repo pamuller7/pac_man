@@ -1,16 +1,4 @@
-"""Game configuration: reads and validates the JSON config file.
-
-The file is plain JSON with one extra rule: `#`, `//` and `;` start a
-comment that runs to the end of the line. What comes before it on the
-line is kept, so a comment can sit after a value. Every key is optional,
-the defaults below are used when a key is missing.
-
-This module never imports pygame: the config must be readable (and the
-program must be able to fail cleanly) before any window is opened.
-"""
-
 import json
-import pygame
 import random
 import re
 from src.renderer.display import CELL_SIZE
@@ -19,6 +7,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    ValidationInfo,
     ValidationError,
     model_validator)
 
@@ -129,18 +118,19 @@ class Level(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def fallback(cls, data: Any) -> Any:
+    def fallback(cls, data: Any, info: ValidationInfo) -> Any:
         if not isinstance(data, dict):
             return data
         data = data.copy()
-        pygame.init()
-        info = pygame.display.Info()
-        screen_width_m = info.current_w
-        screen_height_m = info.current_h
-        check_int(data, "width", 20, 15,
-                  screen_width_m//CELL_SIZE - 4, clamp=True)
-        check_int(data, "height", 20, 15,
-                  screen_height_m//CELL_SIZE - 4, clamp=True)
+        context = info.context or {}
+
+        screen_width = context.get("screen_width", 1280)
+        screen_height = context.get("screen_height", 720)
+
+        max_width = screen_width // CELL_SIZE - 4
+        max_height = screen_height // CELL_SIZE - 4
+        check_int(data, "width", 20, 15, max_width, clamp=True)
+        check_int(data, "height", 20, 15, max_height, clamp=True)
         nb_pacgum = data["width"] * data["height"]
         pacgum = get_int(data, "pacgum", nb_pacgum)
         data["pacgum"] = pacgum if pacgum >= 1 else nb_pacgum
@@ -212,7 +202,8 @@ def format_errors(exc: ValidationError) -> str:
 
 # ------------------------------------------------------------#
 
-def load_config(path: str) -> Config:
+def load_config(path: str, screen_width: int,
+                screen_height: int) -> Config:
     """Reads `path` and returns the validated configuration.
 
     Raises:
@@ -250,7 +241,14 @@ Duplicate key '{key}' detected, '{key}': {value} ignored")
             f"{path}: expected a JSON object at the top level, "
             f"found {type(data).__name__}.")
     try:
-        return Config.model_validate(data, extra="ignore")
+        return Config.model_validate(
+            data,
+            context={
+                "screen_width": screen_width,
+                "screen_height": screen_height,
+            },
+            extra="ignore",
+        )
     except ValidationError as exc:
         raise ConfigError(
             f"invalid configuration in {path}:\n{format_errors(exc)}"

@@ -76,6 +76,7 @@ def open_window(level: Level, max_height: int, max_width: int,
 def play_run(screen: pygame.Surface,
              config: Config, max_height: int,
              max_width: int,
+             screen_width: int, screen_height: int,
              sprite_cache: dict[tuple[str, int], pygame.Surface]
              ) -> Tuple[bool, int, pygame.Surface]:
     """Plays the levels in order until one is lost or all are cleared.
@@ -89,8 +90,6 @@ def play_run(screen: pygame.Surface,
                     maze_infos=(0, 0),
                     hp=config.lives)
     level_number = 0
-    max_width = max(var.width for var in config.levels)
-    max_height = max(var.height for var in config.levels)
     while level_number < config.max_nb_level:
         level = config.levels[level_number]
         if level_number == 0:
@@ -116,16 +115,23 @@ def play_run(screen: pygame.Surface,
         if not won:
             return False, total, screen
         if level_number == len(config.levels):
-            new_level = Level(
-                width=rng.randint(15, max_width),
-                height=rng.randint(15, max_height),
-                seed=rng.randint(SEED_MIN, SEED_MAX),
+            new_level = Level.model_validate(
+                {
+                    "width": rng.randint(15, screen_width//CELL_SIZE - 4),
+                    "height": rng.randint(15, screen_height//CELL_SIZE - 4),
+                    "seed": rng.randint(SEED_MIN, SEED_MAX),
+                },
+                context={
+                    "screen_width": screen_width,
+                    "screen_height": screen_height,
+                },
             )
             config.levels.append(new_level)
     return True, total, screen
 
 
-def game_loop(config: Config) -> None:
+def game_loop(config: Config, screen_width: int,
+              screen_height: int) -> None:
     """Menu -> game -> name entry, until the player leaves."""
     board = Scoreboard(config.highscore_filename)
     board.load()
@@ -134,8 +140,13 @@ def game_loop(config: Config) -> None:
     sprite_cache: dict[tuple[str, int], pygame.Surface] = dict()
     screen = open_window(config.levels[0], max_height, max_width)
     while main_menu(screen, board.top(TOP_SHOWN)):
-        won, score, screen = play_run(screen, config, max_height,
-                                      max_width, sprite_cache)
+        won, score, screen = play_run(screen=screen,
+                                      config=config,
+                                      max_height=max_height,
+                                      max_width=max_width,
+                                      sprite_cache=sprite_cache,
+                                      screen_width=screen_width,
+                                      screen_height=screen_height)
         if not display_endgame(screen, score, won):
             break
         name = ask_name(screen, won, score)
@@ -155,7 +166,17 @@ def main(argv: List[str]) -> int:
         print(USAGE)
         return 1
     try:
-        config = load_config(argv[1])
+        pygame.init()
+
+        info = pygame.display.Info()
+        screen_width = info.current_w
+        screen_height = info.current_h
+
+        config = load_config(
+            argv[1],
+            screen_width,
+            screen_height,
+        )
     except PacManError as exc:
         print(f"\033[33m[Warning]\033[0m pac-man: {exc}", file=sys.stderr)
         print("\033[33m[Warning]\033[0m Default \
@@ -163,7 +184,7 @@ def main(argv: List[str]) -> int:
         config = Config()
     try:
         pygame.init()
-        game_loop(config)
+        game_loop(config, screen_width, screen_height)
     except PacManError as exc:
         print(f"\033[31m[Error]\033[0m pac-man: {exc}", file=sys.stderr)
         return 1
