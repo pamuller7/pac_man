@@ -34,6 +34,19 @@ uv run pac-man.py [config_file.json]
 ```
 the config file must be a valid json file, as described in the `Configuration` part
 
+to create a pac man binary, run
+```sh
+make build
+```
+it will create a dist directory. to run the binary:
+```sh
+./dist/pac-man/pac-man [config_file.json]
+```
+
+Otherwise you can install the project on: https://xx-darkpacman-xx.itch.io/pacman (private).
+You will have to write your own config.json file, empty for simple run, or following the configuration part.
+
+
 ### Configuration
 eg of a configuration file:
 ```json
@@ -225,3 +238,7 @@ sprites : https://www.spriters-resource.com/arcade/pacman/
 mlx : https://github.com/42school/mlx_CLXV (to look at available funcitions, for pygame)
 pygame : https://www.pygame.org/docs/
 
+AI usage:
+-> pyinstall understanding (creation of the binary pacman)
+-> fixing mooves for ghosts (like avoid them to stay on the same spot for too long)
+-> README (having an idea of what is expected in each sections)
