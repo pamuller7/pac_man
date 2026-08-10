@@ -137,7 +137,6 @@ class Level(BaseModel):
         info = pygame.display.Info()
         screen_width_m = info.current_w
         screen_height_m = info.current_h
-        print(screen_height_m, screen_width_m)
         check_int(data, "width", 20, 15,
                   screen_width_m//CELL_SIZE - 4, clamp=True)
         check_int(data, "height", 20, 15,

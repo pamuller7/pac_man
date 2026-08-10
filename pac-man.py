@@ -53,7 +53,6 @@ def find_spawn(maze: List[List[int]]) -> Tuple[int, int]:
 
 def new_maze(level: Level) -> List[List[int]]:
     """Generates a fresh maze of the size asked by `level`."""
-    print(level.seed)
     maze: List[List[int]] = MazeGenerator(
         size=(level.width, level.height),
         seed=level.seed).maze

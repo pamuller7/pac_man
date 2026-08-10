@@ -20,6 +20,7 @@ build:
 	uv run pyinstaller \
 	--windowed \
   	--add-data "assets:assets" \
+	--add-data "README.md:readme" \
   	--add-data "src/:src/" \
   	pac-man.py
 
