@@ -16,10 +16,17 @@ run: install
 debug:
 	@echo "debugging..."
 
+build:
+	uv run pyinstaller \
+	--windowed \
+  	--add-data "assets:assets" \
+  	--add-data "config.json:." \
+  	--add-data "src/:src/" \
+  	pac-man.py
 
 clean:
 	@echo "cleaning..."
-	@rm -rf *__pycache__/ src/__pycache__ src/*/__pycache__/ .venv src/renderer/screen_menu/__pycache__ data .mypy_cache pac-man.spec
+	@rm -rf *__pycache__/ src/__pycache__ src/*/__pycache__/ src/renderer/screen_menu/__pycache__ data .mypy_cache pac-man.spec
 	@rm -rf corrupted_scores.txt
 	@rm -rf dist build
 
@@ -28,7 +35,7 @@ clean-all: clean
 
 lint:
 	@echo "linting..."
-	uv run flake8 src pac-man.py
+	uv run flake8 src pac-man.py path.py
 	uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 

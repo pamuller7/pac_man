@@ -12,6 +12,11 @@ dependencies = [
     "pyinstaller"
 ]
 
+[dependency-groups]
+dev = [
+    "flake8",
+]
+
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 

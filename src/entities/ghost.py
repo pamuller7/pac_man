@@ -56,7 +56,7 @@ class Ghost(Entity):
         elif self.normal_behaviour and not self.targetable:
             self.nomal_proc()
         elif not self.normal_behaviour and not self.targetable:
-            if self.dist_from_pac_man < 3:
+            if self.dist_from_pac_man < 5:
                 self.go_to_corner(1)
             else:
                 self.random_dir(avb_cells)

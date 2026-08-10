@@ -36,8 +36,9 @@ class Invalidwindow(MazeError):
 
     def __init__(self) -> None:
         super().__init__(
-            f"Window size is invalid."
+            "Window size is invalid."
         )
+
 
 class InvalidCellError(MazeError):
     """

@@ -40,6 +40,8 @@ def random_seed() -> int:
     return random.randint(SEED_MIN, SEED_MAX)
 
 
+# ------------------------------------------------------------#
+
 def get_int(data: dict[str, Any], key: str, default: int) -> int:
     value = data.get(key, default)
 
@@ -50,10 +52,14 @@ def get_int(data: dict[str, Any], key: str, default: int) -> int:
 {key} set to {default}")
         return default
 
+# ------------------------------------------------------------#
+
 
 class ConfigError(PacManError):
     """Raised when the configuration file cannot be read or used."""
 
+
+# ------------------------------------------------------------#
 
 class DuplicateConfigKeyError(ConfigError):
     """Raised when a JSON object in the config repeats the same key."""
@@ -65,6 +71,8 @@ class DuplicateConfigKeyError(ConfigError):
         )
         self.path = path
         self.key = key
+
+# ------------------------------------------------------------#
 
 
 def check_int(
@@ -107,6 +115,9 @@ def check_str(data: dict[str, Any], key: str, default: str) -> None:
     data[key] = value
 
 
+# ------------------------------------------------------------#
+
+
 class Level(BaseModel):
     """One playable level of the game."""
 
@@ -115,6 +126,7 @@ class Level(BaseModel):
     width: int = 20
     height: int = 20
     seed: int = Field(default_factory=random_seed, ge=SEED_MIN)
+    pacgum: int = -1
 
     @model_validator(mode="before")
     @classmethod
@@ -122,16 +134,18 @@ class Level(BaseModel):
         if not isinstance(data, dict):
             return data
         data = data.copy()
-        if "pacgum" in data:
-            print(f"\033[33m[Warning]\033[0m 'pacgum': \
-{data.pop('pacgum')} set inside a level. 'pacgum' is a top-level key only, \
-this one is ignored")
         pygame.init()
         info = pygame.display.Info()
         screen_width_m = info.current_w
         screen_height_m = info.current_h
         check_int(data, "width", 20, 15, 60, clamp=True)
         check_int(data, "height", 20, 15, 30, clamp=True)
+        nb_pacgum = data["width"] * data["height"]
+        pacgum = get_int(data, "pacgum", nb_pacgum)
+        data["pacgum"] = pacgum if pacgum >= 1 else nb_pacgum
+        if data["pacgum"] != pacgum:
+            print(f"\033[33m[Warning]\033[0m 'pacgum': {pacgum} < 1 \
+defaul behevior(100% of the maze)")
         if data["width"] >= screen_width_m:
             print(f"\033[33m[Warning]\033[0m 'width': {data['width']} "
                   f"wider than the screen ({screen_width_m})")
@@ -143,6 +157,8 @@ this one is ignored")
                       note=" (drawn at random)")
         return data
 
+# ------------------------------------------------------------#
+
 
 class Config(BaseModel):
     """Whole content of the configuration file."""
@@ -150,7 +166,6 @@ class Config(BaseModel):
 
     highscore_filename: str = "data/scores.json"
     lives: int = 3
-    pacgum: int = -1
     level_max_time: int = 120
     points_per_pacgum: int = 10
     points_per_super_pacgum: int = 50
@@ -165,7 +180,6 @@ class Config(BaseModel):
             return data
         data = data.copy()
         check_str(data, "highscore_filename", "data/scores.json")
-        check_int(data, "pacgum", -1, minimum=1, note=" (80% of the maze)")
         check_int(data, "lives", 3, minimum=1)
         check_int(data, "level_max_time", 120, minimum=1)
         check_int(data, "points_per_pacgum", 10, minimum=0)
@@ -175,6 +189,8 @@ class Config(BaseModel):
         if not data.get("levels"):
             data["levels"] = [Level(width=20, height=20)]
         return data
+
+# ------------------------------------------------------------#
 
 
 def strip_comments(text: str) -> str:
@@ -191,6 +207,8 @@ def strip_comments(text: str) -> str:
     )
 
 
+# ------------------------------------------------------------#
+
 def format_errors(exc: ValidationError) -> str:
     """Turns a pydantic error into one readable line per bad key."""
     lines = []
@@ -199,6 +217,8 @@ def format_errors(exc: ValidationError) -> str:
         lines.append(f"  - {key or '<root>'}: {error['msg']}")
     return "\n".join(lines)
 
+
+# ------------------------------------------------------------#
 
 def load_config(relative_path: str) -> Config:
     """Reads `path` and returns the validated configuration.
@@ -221,15 +241,16 @@ def load_config(relative_path: str) -> Config:
         result = {}
         for key, value in pairs:
             if key in seen:
-                raise DuplicateConfigKeyError(path, key)
-            seen.add(key)
-            result[key] = value
+                print(f"\033[33m[Warning]\033[0m \
+Duplicate key {key} detected, {key}: {value} ignored")
+            else:
+                seen.add(key)
+                result[key] = value
         return result
 
     try:
         data = json.loads(
             strip_comments(raw), object_pairs_hook=reject_duplicates)
-        # print(data)
     except json.JSONDecodeError as exc:
         raise ConfigError(
             f"{path}:{exc.lineno}: invalid JSON: {exc.msg}.") from exc

@@ -115,10 +115,10 @@ class Engine:
     def __init__(self, maze: List[List[int]], player: PacMan,
                  level_number: int,
                  sprite_cache: dict[tuple[str, int], pygame.Surface],
+                 level: Level,
                  screen: pygame.Surface | None = None,
                  maze_surface: pygame.Surface | None = None,
-                 config: Config | None = None,
-                 level: Level | None = None) -> None:
+                 config: Config | None = None) -> None:
         """Sets up the maze surface and Pac-Man.
 
         Creates the window only if no `screen` is given, and rebuilds the
@@ -162,9 +162,9 @@ class Engine:
 
         self.buffered_dir: str | None = None
         self.skip_level = False
-
-        self.spawn_pacgums(maze, self.pacgum_count(maze))
-
+        level_pacgum = (level.pacgum if level.pacgum
+                        else level.width * level.height)
+        self.spawn_pacgums(level_pacgum)
         red_pos, blue_pos, orange_pos, pink_pos = find_corner(maze)
         maze_infos = (len(maze[0]) - 1, len(maze) - 1)
         self.ghosts = [RedGhost(red_pos[0], red_pos[1],
@@ -203,18 +203,7 @@ class Engine:
                 (corners if is_corner else others).append((x, y))
         return (corners, others)
 
-    def pacgum_count(self, maze: List[List[int]]) -> int:
-        """How many pacgums this level asks for.
-
-        Only the top-level 'pacgum' key of the configuration decides it,
-        so every level of a run gets the same number. Left out (or -1),
-        the maze is filled at 80% instead.
-        """
-        if self.config.pacgum >= 1:
-            return self.config.pacgum
-        return int(80 * len(maze) * len(maze[0]) / 100)
-
-    def spawn_pacgums(self, maze: List[List[int]], count: int) -> None:
+    def spawn_pacgums(self, count: int) -> None:
         """Spreads at most `count` pacgums over the walkable cells.
 
         The walkable corners always get a super pacgum; the remaining

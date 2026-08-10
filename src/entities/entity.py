@@ -61,7 +61,7 @@ class Entity:
 
     def set_init_pos(self, pos_x: int, pos_y: int,
                      maze_infos: Tuple[int, int]) -> None:
-        self.pos.set(pos_x, pos_y)      # mute l'objet existant
+        self.pos.set(pos_x, pos_y)
         self.init_pos = (pos_x, pos_y)
         self.maze_infos = maze_infos
         self.render_x = pos_x * CELL_SIZE

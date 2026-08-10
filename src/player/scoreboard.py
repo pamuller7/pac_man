@@ -23,7 +23,7 @@ class Scoreboard:
     def __init__(self, path: str = DEFAULT_PATH) -> None:
         self.path = path
         self.players: dict[str, Player] = {}
-        self.scores: list[tuple[str, int]] = []
+        # self.scores: list[tuple[str, int]] = []
 
     def load(self) -> None:
         """Reads the file. Does nothing if it does not exist yet.
@@ -43,8 +43,9 @@ class Scoreboard:
                 entry["name"]: Player.from_dict(entry)
                 for entry in data["players"]
             }
-            self.scores = [(name, int(score))
-                           for name, score in data["scores"]]
+            for x in self.players.values():
+                if x.best_score < 0:
+                    raise ValueError
         except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
             error = ScoreboardCorruptedError(self.path, str(exc))
             print("\033[33m[Warning]\033[0m", error)
@@ -61,13 +62,14 @@ reinitialize {self.path} ? (y/n): ")
                 with open("corrupted_scores.txt", "w") as file:
                     file.write(corrupted_data)
                 with open(self.path, "w", encoding="utf-8") as file:
-                    new_data: dict[str, list[Any]] = {"players": [],
-                                                      "scores": []}
+                    new_data: dict[str, list[Any]] = {"players": []}
                     json.dump(new_data, file)
                 print("\033[32m[Resolved]\033[0m corrupted data can be \
 found in 'corrupted_scores.txt'")
             else:
                 raise error from exc
+
+    # ---------------------------------------------------------------#
 
     def save(self) -> None:
         """Writes the board to disk, creating the folder if needed.
@@ -79,15 +81,9 @@ found in 'corrupted_scores.txt'")
         if folder:
             os.makedirs(folder, exist_ok=True)
         players = [player.to_dict() for player in self.players.values()]
-        players.sort(key=lambda x: x["best_score"])
-        if len(players) > 10:
-            players.pop(0)
-        scores = sorted(self.scores, key=lambda entry: entry[1])
-        if len(scores) > 10:
-            scores.pop(0)
+        players.sort(key=lambda x: x["best_score"], reverse=True)
         data = {
-            "players": players,
-            "scores": scores,
+            "players": players[:10],
         }
         tmp_path = f"{self.path}.tmp"
         with open(tmp_path, "w", encoding="utf-8") as file:
@@ -108,12 +104,12 @@ found in 'corrupted_scores.txt'")
     def add_score(self, player: Player, score: int) -> bool:
         """Records one game result. True if it is a personal record."""
         self.players.setdefault(player.name, player)
-        self.scores.append((player.name, score))
         return player.record(score)
 
-    def top(self, limit: int = 10) -> list[tuple[str, int]]:
+    def top(self, limit: int = 10) -> list[Player]:
         """Returns the `limit` best scores, highest first."""
-        return sorted(self.scores, key=lambda entry: entry[1],
+        return sorted(self.players.values(),
+                      key=lambda player: player.best_score,
                       reverse=True)[:limit]
 
     def best_of(self, name: str) -> int:

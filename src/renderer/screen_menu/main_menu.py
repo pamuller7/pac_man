@@ -1,4 +1,5 @@
 import pygame
+from src.player.player import Player
 from src.renderer.display import draw_text, YELLOW, BLACK
 from path import resource_path
 import os
@@ -60,7 +61,7 @@ def instructions_menu(screen: pygame.Surface) -> None:
 
 
 def main_menu(screen: pygame.Surface,
-              scores: list[tuple[str, int]] | None = None) -> bool:
+              scores: list[Player] | None = None) -> bool:
     """Displays the main menu. Returns False if the player quits.
 
     `scores` is the (name, score) ranking to show, best first; an empty
@@ -69,6 +70,9 @@ def main_menu(screen: pygame.Surface,
     centre_x = screen.get_width() // 2
     centre_y = screen.get_height() // 2
     pygame.event.clear()
+    scores = sorted(scores,
+                    key=lambda player: player.best_score,
+                    reverse=True) if scores else None
     while True:
         screen.fill(BLACK)
         try:
@@ -83,8 +87,9 @@ def main_menu(screen: pygame.Surface,
         if scores:
             draw_text(screen, "MEILLEURS SCORES", 30,
                       (centre_x, centre_y + 60), YELLOW)
-            for rank, (name, score) in enumerate(scores):
-                draw_text(screen, f"{rank + 1}. {name} - {score}", 25,
+            for rank, player in enumerate(scores):
+                draw_text(screen, f"{rank + 1}. \
+{player.name} - {player.best_score}", 25,
                           (centre_x, centre_y + 100 + rank * 25), YELLOW)
         pygame.display.flip()
         for event in pygame.event.get():

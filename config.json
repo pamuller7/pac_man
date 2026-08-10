@@ -3,14 +3,12 @@
     "highscore_filename": "data/score.json",
     "lives":50,
     
-    "pacgum": 5,
+    
     "points_per_pacgum": 100,
     "points_per_super_pacgum": 50,
     "points_per_ghost": 200,
     "level_max_time": 200,
     "levels": [
-        { "width": 19, "height": 21},
-        { "width": 15, "height": 15},
-        { "width": 20, "height": 15}
+        { "width": 5, "height": 15, "height": 20, "pacgum": 10}
     ]
 }

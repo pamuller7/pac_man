@@ -131,7 +131,8 @@ def game_loop(config: Config) -> None:
             break
         name = ask_name(screen, won, score)
         if name:
-            board.add_score(board.get_player(name), score)
+            player = board.get_player(name)
+            board.add_score(player, score)
             board.save()
 
 
@@ -147,8 +148,9 @@ def main(argv: List[str]) -> int:
     try:
         config = load_config(argv[1])
     except PacManError as exc:
-        print(f"pac-man: {exc}", file=sys.stderr)
-        print("Default values will be used - cf README.md, config section")
+        print(f"\033[33m[Warning]\033[0m pac-man: {exc}", file=sys.stderr)
+        print("\033[33m[Warning]\033[0m Default \
+              values will be used - cf README.md, config section")
         config = Config()
     try:
         pygame.init()
