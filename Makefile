@@ -17,13 +17,13 @@ debug:
 	@echo "debugging..."
 
 build:
-	uv run pyinstaller \
+	@uv run pyinstaller \
 	--windowed \
   	--add-data "assets:assets" \
 	--add-data "README.md:readme" \
   	--add-data "src/:src/" \
   	pac-man.py
-	cd dist && zip -r ../pacman.zip pac-man
+	@cd dist && zip -r ../pacman.zip pac-man
 
 clean:
 	@echo "cleaning..."
@@ -31,6 +31,7 @@ clean:
 	@rm -rf corrupted_scores.txt
 	@rm -rf dist build
 	@rm -rf pacman.zip
+	@rm -rf default_config.json
 
 clean-all: clean
 	@rm -rf .venv

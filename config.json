@@ -6,7 +6,4 @@
     "points_per_super_pacgum": 50,
     "points_per_ghost": 200,
     "level_max_time": 200,
-    "max_nb_level": 5,
-    "levels": [ {"width": 60, "height": 63}
-    ]
-}
+    "max_nb_

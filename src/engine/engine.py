@@ -381,7 +381,7 @@ class Engine:
         """Returns the pixel where the top-left maze cell is drawn.
 
         The window is opened once for the whole run, so a level smaller
-        than the window is centred in it instead of the window being
+        than the window is centerd in it instead of the window being
         resized to it. A maze larger than the window is pinned under the
         HUD rather than pushed off screen.
         """
@@ -412,7 +412,7 @@ class Engine:
                   f"score: {self.pacman.score}, hp: {self.pacman.hp},\
    {self.config.level_max_time - int(self._get_current_time())}s,\
     level: {self.level_number}",
-                  36, (0, 0), YELLOW, centre=False)
+                  36, (0, 0), YELLOW, center=False)
         pygame.display.flip()
 
     def _skip_level(self) -> bool:

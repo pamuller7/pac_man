@@ -8,18 +8,19 @@ Python traceback, and exits with EXIT_FAILURE.
 """
 
 import sys
+import json
 from time import time
 from typing import List, Tuple
 import random
 import pygame
 from src.entities import PacMan
-from src.error import Invalidwindow, NoSpawnError
+from src.error import Invalidwindow, NoSpawnError, PacManError
 from mazegenerator import MazeGenerator
 from src.config import (Config, Level,
+                        ConfigError,
                         load_config,
                         SEED_MIN, SEED_MAX)
 from src.engine import Engine
-from src.error import PacManError
 from src.player import Scoreboard
 from src.renderer import (HUD_HEIGHT, CELL_SIZE, ask_name, display_endgame,
                           draw_maze, main_menu)
@@ -118,8 +119,8 @@ def play_run(screen: pygame.Surface,
         if level_number == len(config.levels):
             new_level = Level.model_validate(
                 {
-                    "width": rng.randint(15, max_width),
-                    "height": rng.randint(15, max_height),
+                    "width": rng.randint(10, max_width),
+                    "height": rng.randint(10, max_height),
                     "seed": rng.randint(SEED_MIN, SEED_MAX),
                 },
                 context={
@@ -164,16 +165,33 @@ def main(argv: List[str]) -> int:
         return 1
     try:
         pygame.init()
-
         info = pygame.display.Info()
         screen_width = info.current_w
         screen_height = info.current_h
         config = load_config(argv[1], screen_width, screen_height)
-    except PacManError as exc:
+    except (PacManError, ConfigError) as exc:
         print(f"\033[33m[Warning]\033[0m pac-man: {exc}", file=sys.stderr)
         print("\033[33m[Warning]\033[0m Default \
- values will be used - cf README.md, config section")
-        config = Config()
+ values will be used using 'default_confiig.json'\
+ - cf README.md, config section")
+        with open("default_config.json", 'w') as file:
+            json.dump({
+                "highscore_filename": "data/score.json",
+                "lives": 3,
+                "points_per_pacgum": 100,
+                "points_per_super_pacgum": 50,
+                "points_per_ghost": 200,
+                "level_max_time": 200,
+                "max_nb_level": 10,
+                "levels": [{}]
+            }, file)
+        pygame.init()
+        info = pygame.display.Info()
+        screen_width = info.current_w
+        screen_height = info.current_h
+        config = load_config("default_config.json",
+                             screen_width,
+                             screen_height)
     try:
         pygame.init()
         game_loop(config, screen_width, screen_height)

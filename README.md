@@ -242,3 +242,5 @@ AI usage:
 -> pyinstall understanding (creation of the binary pacman)
 -> fixing mooves for ghosts (like avoid them to stay on the same spot for too long)
 -> README (having an idea of what is expected in each sections)
+-> understanding pygame mechanics to be near as possible to mlx 
+-> refacto for well communcation with the mate
