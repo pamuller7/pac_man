@@ -34,11 +34,11 @@ def draw_text(surface: pygame.Surface, texte: str, taille: int,
     return rect
 
 
-def draw_cell(surface: pygame.Surface, col: int, ligne: int,
+def draw_cell(surface: pygame.Surface, col: int, line: int,
               valeur: int) -> None:
     """Draws one maze cell (walls) onto the maze surface, pixel by pixel."""
     start_x = col * CELL_SIZE
-    start_y = ligne * CELL_SIZE
+    start_y = line * CELL_SIZE
     for i in range(CELL_SIZE):
         for j in range(CELL_SIZE):
             couleur = None

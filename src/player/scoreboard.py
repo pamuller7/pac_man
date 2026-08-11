@@ -24,7 +24,6 @@ class Scoreboard:
     def __init__(self, path: str = DEFAULT_PATH) -> None:
         self.path = resource_path(path)
         self.players: dict[str, Player] = {}
-        # self.scores: list[tuple[str, int]] = []
 
     def load(self) -> None:
         """Reads the file. Does nothing if it does not exist yet.
