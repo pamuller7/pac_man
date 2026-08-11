@@ -12,8 +12,8 @@ def display_endgame(screen: pygame.Surface, score: int = 0,
 
     True means "carry on with the flow" (score entry, then main menu).
     """
-    centre_x = screen.get_width() // 2
-    centre_y = screen.get_height() // 2
+    center_x = screen.get_width() // 2
+    center_y = screen.get_height() // 2
 
     screen.fill(BLACK)
 
@@ -23,10 +23,10 @@ def display_endgame(screen: pygame.Surface, score: int = 0,
         screen.blit(load_sprite(sprite, screen), (0, 10))
     except (AssetNotFoundError, AssetError):
         pass
-    draw_text(screen, titre, 60, (centre_x, centre_y - 45), YELLOW)
-    draw_text(screen, f"SCORE : {score}", 30, (centre_x, centre_y), YELLOW)
+    draw_text(screen, titre, 60, (center_x, center_y - 45), YELLOW)
+    draw_text(screen, f"SCORE : {score}", 30, (center_x, center_y), YELLOW)
     draw_text(screen, "ESPACE : CONTINUER   -   ECHAP : QUITTER", 30,
-              (centre_x, centre_y + 50), YELLOW)
+              (center_x, center_y + 50), YELLOW)
     pygame.display.flip()
 
     pygame.event.clear()

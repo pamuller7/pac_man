@@ -13,13 +13,13 @@ def pause_menu(screen: pygame.Surface, player: Any,
     overlay.fill((0, 0, 0))
     screen.blit(overlay, (0, 0))
 
-    centre = (screen.get_width() // 2, screen.get_height() // 2)
+    center = (screen.get_width() // 2, screen.get_height() // 2)
     line_height = 35
 
     draw_text(screen, "PAUSE", 60,
-              (centre[0], centre[1] + line_height * -2), RED)
+              (center[0], center[1] + line_height * -2), RED)
     draw_text(screen, "-> n to skip the level", 30,
-              (centre[0], centre[1] + line_height * -1), RED)
+              (center[0], center[1] + line_height * -1), RED)
     if player.god_mod:
         god_info = "disable"
     else:
@@ -34,12 +34,12 @@ def pause_menu(screen: pygame.Surface, player: Any,
     else:
         freeze_time = "freeze"
     draw_text(screen, god_txt, 30,
-              (centre[0], centre[1] + line_height * 0), RED)
+              (center[0], center[1] + line_height * 0), RED)
     draw_text(screen, f"-> f to {freeze_info} ghosts", 30,
-              (centre[0], centre[1] + line_height * 1), RED)
+              (center[0], center[1] + line_height * 1), RED)
     draw_text(screen, f"-> t to {freeze_time} time.", 30,
-              (centre[0], centre[1] + line_height * 2), RED)
+              (center[0], center[1] + line_height * 2), RED)
     draw_text(screen, f"-> h to increase hp. current: {player.hp}", 30,
-              (centre[0], centre[1] + line_height * 3), RED)
+              (center[0], center[1] + line_height * 3), RED)
     draw_text(screen, "-> escape to go to the menu", 30,
-              (centre[0], centre[1] + line_height * 4), RED)
+              (center[0], center[1] + line_height * 4), RED)

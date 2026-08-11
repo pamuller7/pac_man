@@ -10,23 +10,23 @@ HUD_HEIGHT = 50
 _FONT_CACHE: dict[int, pygame.font.Font] = {}
 
 
-def get_font(taille: int) -> pygame.font.Font:
+def get_font(size: int) -> pygame.font.Font:
     """Returns a cached pygame Font for the given size."""
-    if taille not in _FONT_CACHE:
-        _FONT_CACHE[taille] = pygame.font.Font(None, taille)
-    return _FONT_CACHE[taille]
+    if size not in _FONT_CACHE:
+        _FONT_CACHE[size] = pygame.font.Font(None, size)
+    return _FONT_CACHE[size]
 
 
-def draw_text(surface: pygame.Surface, texte: str, taille: int,
+def draw_text(surface: pygame.Surface, texte: str, size: int,
               position: tuple[int, int],
-              couleur: tuple[int, int, int] = YELLOW,
-              centre: bool = True) -> pygame.Rect:
+              color: tuple[int, int, int] = YELLOW,
+              center: bool = True) -> pygame.Rect:
     """
     Rends du texte et le blit sur la surface.
     """
-    font = get_font(taille)
-    rendu = font.render(texte, True, couleur)
-    if centre:
+    font = get_font(size)
+    rendu = font.render(texte, True, color)
+    if center:
         rect = rendu.get_rect(center=position)
     else:
         rect = rendu.get_rect(topleft=position)
@@ -41,17 +41,17 @@ def draw_cell(surface: pygame.Surface, col: int, line: int,
     start_y = line * CELL_SIZE
     for i in range(CELL_SIZE):
         for j in range(CELL_SIZE):
-            couleur = None
+            color = None
             if i == 0 and (valeur & N):
-                couleur = (0, 0, 255)
+                color = (0, 0, 255)
             elif i == CELL_SIZE - 1 and (valeur & S):
-                couleur = (0, 0, 255)
+                color = (0, 0, 255)
             elif j == 0 and (valeur & W):
-                couleur = (0, 0, 255)
+                color = (0, 0, 255)
             elif j == CELL_SIZE - 1 and (valeur & E):
-                couleur = (0, 0, 255)
-            if couleur:
-                surface.set_at((start_x + j, start_y + i), couleur)
+                color = (0, 0, 255)
+            if color:
+                surface.set_at((start_x + j, start_y + i), color)
 
 
 def draw_maze(maze: list[list[int]]) -> pygame.Surface:

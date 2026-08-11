@@ -27,13 +27,13 @@ def load_sprite(relative_path: str, screen: pygame.Surface) -> pygame.Surface:
 
 def instructions_menu(screen: pygame.Surface) -> None:
     """Displays the game instructions until the user presses a key."""
-    centre_x = screen.get_width() // 2
+    center_x = screen.get_width() // 2
     screen.fill(BLACK)
     try:
         screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
     except (AssetNotFoundError, AssetError):
         pass
-    draw_text(screen, "INSTRUCTIONS", 50, (centre_x, 60), YELLOW)
+    draw_text(screen, "INSTRUCTIONS", 50, (center_x, 60), YELLOW)
     instructions = [
         "Arrow keys or [w,a,s,d] : Move Pac-Man",
         "Eat all pacgums to complete the level.",
@@ -45,7 +45,7 @@ def instructions_menu(screen: pygame.Surface) -> None:
 
     y = 140
     for line in instructions:
-        draw_text(screen, line, 28, (centre_x, y), YELLOW)
+        draw_text(screen, line, 28, (center_x, y), YELLOW)
         y += 40
     pygame.display.flip()
     while True:
@@ -67,8 +67,8 @@ def main_menu(screen: pygame.Surface,
     `scores` is the (name, score) ranking to show, best first; an empty
     or missing ranking simply hides the board.
     """
-    centre_x = screen.get_width() // 2
-    centre_y = screen.get_height() // 2
+    center_x = screen.get_width() // 2
+    center_y = screen.get_height() // 2
     pygame.event.clear()
     scores = sorted(scores,
                     key=lambda player: player.best_score,
@@ -79,18 +79,18 @@ def main_menu(screen: pygame.Surface,
             screen.blit(load_sprite("assets/menu.png", screen), (0, 80))
         except (AssetNotFoundError, AssetError):
             pass
-        draw_text(screen, "PAC-MAN", 60, (centre_x, centre_y - 120), YELLOW)
+        draw_text(screen, "PAC-MAN", 60, (center_x, center_y - 120), YELLOW)
         draw_text(screen, "ESPACE : JOUER   -   ECHAP : QUITTER", 30,
-                  (centre_x, centre_y - 60), YELLOW)
+                  (center_x, center_y - 60), YELLOW)
         draw_text(screen, "I : INSTRUCTIONS", 30,
-                  (centre_x, centre_y - 10), YELLOW)
+                  (center_x, center_y - 10), YELLOW)
         if scores:
             draw_text(screen, "MEILLEURS SCORES", 30,
-                      (centre_x, centre_y + 60), YELLOW)
+                      (center_x, center_y + 60), YELLOW)
             for rank, player in enumerate(scores):
                 draw_text(screen, f"{rank + 1}. \
 {player.name} - {player.best_score}", 25,
-                          (centre_x, centre_y + 100 + rank * 25), YELLOW)
+                          (center_x, center_y + 100 + rank * 25), YELLOW)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

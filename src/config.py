@@ -124,12 +124,16 @@ class Level(BaseModel):
 
         data = data.copy()
         context = info.context or {}
-        screen_width = context.get("screen_width", 1920)
-        screen_height = context.get("screen_height", 1080)
+        screen_width = context.get("screen_width", 1280)
+        if screen_width < 1280:
+            screen_width = 1280
+        screen_height = context.get("screen_height", 720)
+        if screen_height < 720:
+            screen_height = 720
         max_width = screen_width // CELL_SIZE - 4
         max_height = screen_height // CELL_SIZE - 4
-        check_int(data, "width", 20, 15, max_width, clamp=True)
-        check_int(data, "height", 20, 15, max_height, clamp=True)
+        check_int(data, "width", 20, 10, max_width, clamp=True)
+        check_int(data, "height", 20, 10, max_height, clamp=True)
         nb_pacgum = data["width"] * data["height"]
         pacgum = get_int(data, "pacgum", nb_pacgum)
         data["pacgum"] = pacgum if pacgum >= 1 else nb_pacgum

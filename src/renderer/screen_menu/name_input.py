@@ -15,8 +15,8 @@ def ask_name(screen: pygame.Surface, won: int, score: int = 0) -> str | None:
     window. The name is capped at NAME_MAX_LENGTH so the scoreboard never
     has to reject it.
     """
-    centre_x = screen.get_width() // 2
-    centre_y = screen.get_height() // 2
+    center_x = screen.get_width() // 2
+    center_y = screen.get_height() // 2
     name = ""
 
     pygame.event.clear()
@@ -44,13 +44,13 @@ def ask_name(screen: pygame.Surface, won: int, score: int = 0) -> str | None:
             except (AssetNotFoundError, AssetError):
                 pass
             draw_text(screen, f"SCORE : {score}", 30,
-                      (centre_x, centre_y - 80), YELLOW)
+                      (center_x, center_y - 80), YELLOW)
             draw_text(screen, "ENTREZ VOTRE NOM", 40,
-                      (centre_x, centre_y - 30), YELLOW)
-            draw_text(screen, f"{name}_", 40, (centre_x, centre_y + 20),
+                      (center_x, center_y - 30), YELLOW)
+            draw_text(screen, f"{name}_", 40, (center_x, center_y + 20),
                       YELLOW)
             draw_text(screen, "ENTREE : VALIDER   -   ECHAP : PASSER", 25,
-                      (centre_x, centre_y + 80), YELLOW)
+                      (center_x, center_y + 80), YELLOW)
             pygame.display.flip()
     finally:
         pygame.key.stop_text_input()
